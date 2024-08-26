@@ -1,26 +1,22 @@
-package handlers
+package handlers_test
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/claudealdric/go-todolist-restful-api-server/handlers"
+	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 )
 
 func TestHandleRoot(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
+	request, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	recorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(HandleRoot)
-	handler.ServeHTTP(recorder, req)
-
-	if status := recorder.Code; status != http.StatusOK {
-		t.Errorf(
-			"handler returned wrong status code: got %v, want %v",
-			status,
-			http.StatusOK,
-		)
-	}
+	response := httptest.NewRecorder()
+	handler := http.HandlerFunc(handlers.HandleRoot)
+	handler.ServeHTTP(response, request)
+	testutils.AssertStatus(t, response.Code, http.StatusOK)
 }
