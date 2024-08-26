@@ -9,8 +9,7 @@ import (
 const port = 8080
 
 func main() {
-	router := NewRouter()
-	log.Printf("Starting server on port %d\n", port)
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), router)
+	server := NewServer()
+	err := http.ListenAndServe(fmt.Sprintf(":%d", port), server)
 	log.Fatal(err)
 }
