@@ -10,7 +10,7 @@ import (
 )
 
 func TestHandleRoot(t *testing.T) {
-	request, err := http.NewRequest("GET", "/", nil)
+	request, err := http.NewRequest(http.MethodGet, "/", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
