@@ -10,13 +10,27 @@ import (
 )
 
 func TestHandleRoot(t *testing.T) {
-	request, err := http.NewRequest(http.MethodGet, "/", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	t.Run("responds with 200 OK status on the root path", func(t *testing.T) {
+		request, err := http.NewRequest(http.MethodGet, "/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	response := httptest.NewRecorder()
-	handler := http.HandlerFunc(handlers.HandleRoot)
-	handler.ServeHTTP(response, request)
-	testutils.AssertStatus(t, response.Code, http.StatusOK)
+		response := httptest.NewRecorder()
+		handler := http.HandlerFunc(handlers.HandleRoot)
+		handler.ServeHTTP(response, request)
+		testutils.AssertStatus(t, response.Code, http.StatusOK)
+	})
+
+	t.Run("responds with a 404 not found with an invalid path", func(t *testing.T) {
+		request, err := http.NewRequest(http.MethodGet, "/not-found", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		response := httptest.NewRecorder()
+		handler := http.HandlerFunc(handlers.HandleRoot)
+		handler.ServeHTTP(response, request)
+		testutils.AssertStatus(t, response.Code, http.StatusNotFound)
+	})
 }
