@@ -1,11 +1,10 @@
-package handlers_test
+package server
 
 import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/claudealdric/go-todolist-restful-api-server/handlers"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 )
 
@@ -17,7 +16,7 @@ func TestHandleRoot(t *testing.T) {
 		}
 
 		response := httptest.NewRecorder()
-		handler := http.HandlerFunc(handlers.HandleRoot)
+		handler := http.HandlerFunc(HandleRoot)
 		handler.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 	})

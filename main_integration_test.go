@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
-	"github.com/claudealdric/go-todolist-restful-api-server/handlers"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
+	"github.com/claudealdric/go-todolist-restful-api-server/server"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 )
 
@@ -21,7 +21,7 @@ func TestServer(t *testing.T) {
 	defer cleanDatabase()
 	store, err := datastore.NewFileSystemDataStore(dbFile)
 	testutils.AssertNoError(t, err)
-	server := handlers.NewServer(store)
+	server := server.NewServer(store)
 
 	t.Run("responds with a 200 OK status on the root path", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/", nil)

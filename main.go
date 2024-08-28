@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
-	"github.com/claudealdric/go-todolist-restful-api-server/handlers"
+	"github.com/claudealdric/go-todolist-restful-api-server/server"
 )
 
 const port = 8080
@@ -19,7 +19,7 @@ func main() {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
 	store, err := datastore.NewFileSystemDataStore(dbFile)
-	server := handlers.NewServer(store)
+	server := server.NewServer(store)
 	log.Printf("Starting server on port %d", port)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), server)
 	log.Fatal(err)
