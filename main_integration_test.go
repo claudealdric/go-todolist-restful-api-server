@@ -14,7 +14,7 @@ func TestServer(t *testing.T) {
 	t.Run("responds with a 200 OK status on the root path", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
 		if err != nil {
-			t.Errorf("an error occurred during the request: %v", err)
+			t.Fatalf("an unexpected error occurred: %v", err)
 		}
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
@@ -24,7 +24,7 @@ func TestServer(t *testing.T) {
 	t.Run("responds with a 404 not found status on the root path", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/not-found", nil)
 		if err != nil {
-			t.Errorf("an error occurred during the request: %v", err)
+			t.Fatalf("an unexpected error occurred: %v", err)
 		}
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
