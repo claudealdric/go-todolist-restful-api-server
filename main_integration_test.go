@@ -6,18 +6,26 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
+	"github.com/claudealdric/go-todolist-restful-api-server/handlers"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 )
 
 func TestServer(t *testing.T) {
-	server := NewServer()
+	// TODO: start with an empty database
+	dbFile, cleanDatabase := testutils.CreateTempFile(
+		t,
+		`[{"title": "Buy groceries"}]`,
+	)
+	defer cleanDatabase()
+	store, err := datastore.NewFileSystemDataStore(dbFile)
+	testutils.AssertNoError(t, err)
+	server := handlers.NewServer(store)
 
 	t.Run("responds with a 200 OK status on the root path", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatalf("an unexpected error occurred: %v", err)
-		}
+		testutils.AssertNoError(t, err)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
@@ -25,9 +33,7 @@ func TestServer(t *testing.T) {
 
 	t.Run("responds with a 404 not found status on the root path", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/not-found", nil)
-		if err != nil {
-			t.Fatalf("an unexpected error occurred: %v", err)
-		}
+		testutils.AssertNoError(t, err)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusNotFound)
@@ -35,9 +41,7 @@ func TestServer(t *testing.T) {
 
 	t.Run("returns a slice of tasks with GET on `/tasks`", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/tasks", nil)
-		if err != nil {
-			t.Errorf("an error occurred during the request: %v", err)
-		}
+		testutils.AssertNoError(t, err)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
@@ -46,7 +50,7 @@ func TestServer(t *testing.T) {
 		want := []models.Task{{Title: "Buy groceries"}}
 
 		if !reflect.DeepEqual(got, want) {
-			t.Errorf("got %v, want %v", got, want)
+			t.Errorf("got %+v, want %+v", got, want)
 		}
 	})
 }
