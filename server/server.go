@@ -31,6 +31,6 @@ func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func HandleRoot(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandleRoot(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
