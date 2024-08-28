@@ -30,4 +30,15 @@ func TestServer(t *testing.T) {
 		server.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusNotFound)
 	})
+
+	t.Run("returns an OK status with GET on /tasks", func(t *testing.T) {
+		request, err := http.NewRequest(http.MethodGet, "/tasks", nil)
+		if err != nil {
+			t.Errorf("an error occurred during the request: %v", err)
+		}
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, request)
+		testutils.AssertStatus(t, response.Code, http.StatusOK)
+	})
+
 }
