@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
@@ -15,6 +16,13 @@ func AssertNoError(t testing.TB, err error) {
 		t.Fatalf("didn't expect an error but got one, %v", err)
 	}
 
+}
+
+func AssertEquals[T any](t testing.TB, got, want T) {
+	t.Helper()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v, want %v", got, want)
+	}
 }
 
 func AssertStatus(t testing.TB, got, want int) {

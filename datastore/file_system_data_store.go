@@ -21,7 +21,7 @@ func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
 		return nil, fmt.Errorf("problem initializing player db file, %v", err)
 	}
 
-	league, err := newMockTasks(file)
+	tasks, err := newTasks(file)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -33,7 +33,7 @@ func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
 
 	return &FileSystemDataStore{
 		json.NewEncoder(&tape{file}),
-		league,
+		tasks,
 	}, nil
 }
 
@@ -87,11 +87,11 @@ func initializeDBFile(file *os.File) error {
 	return nil
 }
 
-func newMockTasks(r io.Reader) ([]models.Task, error) {
+func newTasks(r io.Reader) ([]models.Task, error) {
 	var tasks []models.Task
 	err := json.NewDecoder(r).Decode(&tasks)
 	if err != nil {
-		err = fmt.Errorf("problem parsing league, %v", err)
+		err = fmt.Errorf("problem parsing tasks, %v", err)
 	}
 	return tasks, err
 }
