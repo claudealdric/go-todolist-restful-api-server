@@ -11,7 +11,7 @@ import (
 
 func TestServer(t *testing.T) {
 	t.Run("responds with 200 OK status on the root path", func(t *testing.T) {
-		datastore := &mockDataStore{}
+		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
@@ -26,7 +26,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("returns the stored tasks with GET on `/tasks`", func(t *testing.T) {
-		datastore := &mockDataStore{}
+		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
 		request, err := http.NewRequest(http.MethodGet, "/tasks", nil)
@@ -47,18 +47,40 @@ func TestServer(t *testing.T) {
 		}
 
 		got := testutils.GetTasksFromResponse(t, response.Body)
-		want := wantedTasks
+		want := initialTasks
 		testutils.AssertEquals(t, got, want)
+	})
+
+	t.Run("responds with a 201 status created with POST on `/tasks`", func(t *testing.T) {
+		datastore := newMockDataStore()
+		server := NewServer(datastore)
+
+		request, err := http.NewRequest(http.MethodPost, "/tasks", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		response := httptest.NewRecorder()
+		handler := http.HandlerFunc(server.HandlePostTasks)
+		handler.ServeHTTP(response, request)
+		testutils.AssertStatus(t, response.Code, http.StatusCreated)
 	})
 }
 
-var wantedTasks = []models.Task{{Title: "Pack clothes"}}
+var initialTasks = []models.Task{{Title: "Pack clothes"}}
 
 type mockDataStore struct {
 	getTasksCalls int
+	tasks         []models.Task
+}
+
+func newMockDataStore() *mockDataStore {
+	m := mockDataStore{}
+	m.tasks = initialTasks
+	return &m
 }
 
 func (m *mockDataStore) GetTasks() []models.Task {
 	m.getTasksCalls++
-	return wantedTasks
+	return initialTasks
 }
