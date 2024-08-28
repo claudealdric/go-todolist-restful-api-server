@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -51,19 +49,4 @@ func TestServer(t *testing.T) {
 			t.Errorf("got %v, want %v", got, want)
 		}
 	})
-}
-
-func getTasksFromResponse(t *testing.T, body io.Reader) (tasks []models.Task) {
-	t.Helper()
-	err := json.NewDecoder(body).Decode(&tasks)
-
-	if err != nil {
-		t.Fatalf(
-			"unable to parse response from server %q into slice of Task: %v",
-			body,
-			err,
-		)
-	}
-
-	return tasks
 }
