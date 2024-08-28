@@ -10,7 +10,7 @@ import (
 func NewRouter() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc(get("/{$}"), handlers.HandleRoot)
-	mux.HandleFunc(get("/tasks"), handlers.HandleRoot)
+	mux.HandleFunc(get("/tasks"), handlers.HandleGetTasks)
 	return mux
 }
 
