@@ -11,8 +11,8 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 )
 
-func TestServer(t *testing.T) {
-	t.Run("responds with 200 OK status on the root path", func(t *testing.T) {
+func TestHandleRoot(t *testing.T) {
+	t.Run("responds with 200 OK status", func(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
@@ -26,8 +26,10 @@ func TestServer(t *testing.T) {
 		handler.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 	})
+}
 
-	t.Run("returns the stored tasks with GET on `/tasks`", func(t *testing.T) {
+func TestHandleGetTasks(t *testing.T) {
+	t.Run("returns the stored tasks", func(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
@@ -52,8 +54,10 @@ func TestServer(t *testing.T) {
 		want := initialTasks
 		testutils.AssertEquals(t, got, want)
 	})
+}
 
-	t.Run("creates and returns the task with a 201 status created with POST on `/tasks`", func(t *testing.T) {
+func TestHandlePostTasks(t *testing.T) {
+	t.Run("creates and returns the task with a 201 Status Created", func(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
@@ -82,7 +86,7 @@ func TestServer(t *testing.T) {
 
 	})
 
-	t.Run("responds with a 400 Bad Request given an invalid body with POST on `/tasks`", func(t *testing.T) {
+	t.Run("responds with a 400 Bad Request given an invalid body", func(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
