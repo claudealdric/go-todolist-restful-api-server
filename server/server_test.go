@@ -43,6 +43,11 @@ func TestHandleGetTasks(t *testing.T) {
 		handler := http.HandlerFunc(server.HandleGetTasks)
 		handler.ServeHTTP(response, request)
 
+		testutils.AssertContentType(
+			t,
+			testutils.GetContentTypeFromResponse(response),
+			jsonContentType,
+		)
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 		testutils.AssertCalls(t, datastore.getTasksCalls, 1)
 		testutils.AssertEquals(
@@ -72,6 +77,11 @@ func TestHandlePostTasks(t *testing.T) {
 		handler := http.HandlerFunc(server.HandlePostTasks)
 		handler.ServeHTTP(response, request)
 
+		testutils.AssertContentType(
+			t,
+			testutils.GetContentTypeFromResponse(response),
+			jsonContentType,
+		)
 		testutils.AssertStatus(t, response.Code, http.StatusCreated)
 		testutils.AssertCalls(t, datastore.createTaskCalls, 1)
 		testutils.AssertEquals(

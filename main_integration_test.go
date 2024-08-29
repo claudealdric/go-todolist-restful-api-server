@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
@@ -62,9 +61,6 @@ func TestServer(t *testing.T) {
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 
 		got := testutils.GetTasksFromResponse(t, response.Body)
-
-		if !reflect.DeepEqual(got, wantedTasks) {
-			t.Errorf("got %+v, want %+v", got, wantedTasks)
-		}
+		testutils.AssertEquals(t, got, wantedTasks)
 	})
 }

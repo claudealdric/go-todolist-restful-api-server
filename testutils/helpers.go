@@ -3,6 +3,7 @@ package testutils
 import (
 	"encoding/json"
 	"io"
+	"net/http/httptest"
 	"os"
 	"reflect"
 	"testing"
@@ -14,6 +15,13 @@ func AssertCalls(t testing.TB, got, want int) {
 	t.Helper()
 	if got != want {
 		t.Errorf("incorrect number of calls; got %d, want %d", got, want)
+	}
+}
+
+func AssertContentType(t testing.TB, got, want string) {
+	t.Helper()
+	if got != want {
+		t.Errorf("response did not have content-type of %q, got %q", want, got)
 	}
 }
 
@@ -63,6 +71,10 @@ func CreateTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	}
 
 	return tempFile, removeFile
+}
+
+func GetContentTypeFromResponse(response *httptest.ResponseRecorder) string {
+	return response.Result().Header.Get("content-type")
 }
 
 func GetTaskFromResponse(t *testing.T, body io.Reader) (tasks models.Task) {

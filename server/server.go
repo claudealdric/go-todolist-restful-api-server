@@ -9,6 +9,8 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 )
 
+const jsonContentType = "application/json"
+
 type Server struct {
 	store datastore.DataStore
 	http.Handler
