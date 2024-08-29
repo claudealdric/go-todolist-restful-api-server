@@ -10,6 +10,13 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 )
 
+func AssertCalls(t testing.TB, got, want int) {
+	t.Helper()
+	if got != want {
+		t.Errorf("incorrect number of calls; got %d, want %d", got, want)
+	}
+}
+
 func AssertNoError(t testing.TB, err error) {
 	t.Helper()
 	if err != nil {

@@ -24,6 +24,7 @@ func TestHandleRoot(t *testing.T) {
 		response := httptest.NewRecorder()
 		handler := http.HandlerFunc(server.HandleRoot)
 		handler.ServeHTTP(response, request)
+
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 	})
 }
@@ -41,18 +42,14 @@ func TestHandleGetTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		handler := http.HandlerFunc(server.HandleGetTasks)
 		handler.ServeHTTP(response, request)
-		testutils.AssertStatus(t, response.Code, http.StatusOK)
-		if datastore.getTasksCalls != 1 {
-			t.Errorf(
-				"did not receive the right number of calls; want %d, got %d",
-				datastore.getTasksCalls,
-				1,
-			)
-		}
 
-		got := testutils.GetTasksFromResponse(t, response.Body)
-		want := initialTasks
-		testutils.AssertEquals(t, got, want)
+		testutils.AssertStatus(t, response.Code, http.StatusOK)
+		testutils.AssertCalls(t, datastore.getTasksCalls, 1)
+		testutils.AssertEquals(
+			t,
+			testutils.GetTasksFromResponse(t, response.Body),
+			initialTasks,
+		)
 	})
 }
 
@@ -74,16 +71,14 @@ func TestHandlePostTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		handler := http.HandlerFunc(server.HandlePostTasks)
 		handler.ServeHTTP(response, request)
+
 		testutils.AssertStatus(t, response.Code, http.StatusCreated)
-
-		if datastore.createTaskCalls != 1 {
-			t.Errorf("got %d, want %d", datastore.createTaskCalls, 1)
-		}
-
-		got := testutils.GetTaskFromResponse(t, response.Body)
-		want := newTask
-		testutils.AssertEquals(t, got, want)
-
+		testutils.AssertCalls(t, datastore.createTaskCalls, 1)
+		testutils.AssertEquals(
+			t,
+			testutils.GetTaskFromResponse(t, response.Body),
+			newTask,
+		)
 	})
 
 	t.Run("responds with a 400 Bad Request given an invalid body", func(t *testing.T) {
@@ -101,11 +96,9 @@ func TestHandlePostTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		handler := http.HandlerFunc(server.HandlePostTasks)
 		handler.ServeHTTP(response, request)
-		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
 
-		if datastore.createTaskCalls != 0 {
-			t.Errorf("got %d, want %d", datastore.createTaskCalls, 0)
-		}
+		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
+		testutils.AssertCalls(t, datastore.createTaskCalls, 0)
 	})
 }
 
@@ -118,9 +111,8 @@ type mockDataStore struct {
 }
 
 func newMockDataStore() *mockDataStore {
-	m := mockDataStore{}
-	m.tasks = initialTasks
-	return &m
+	m := &mockDataStore{tasks: initialTasks}
+	return m
 }
 
 func (m *mockDataStore) CreateTask(task models.Task) models.Task {
@@ -130,5 +122,5 @@ func (m *mockDataStore) CreateTask(task models.Task) models.Task {
 
 func (m *mockDataStore) GetTasks() []models.Task {
 	m.getTasksCalls++
-	return initialTasks
+	return m.tasks
 }
