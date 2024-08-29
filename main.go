@@ -5,16 +5,22 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
 	"github.com/claudealdric/go-todolist-restful-api-server/server"
 )
 
 const port = 8080
+const dbDirName = "tmp"
 const dbFileName = "db.json"
 
 func main() {
-	dbFile, err := os.OpenFile(dbFileName, os.O_RDWR|os.O_CREATE, 0666)
+	if err := os.MkdirAll(dbDirName, os.ModePerm); err != nil {
+		log.Fatalf("failed to create directory: %v", err)
+	}
+	dbPath := filepath.Join(dbDirName, dbFileName)
+	dbFile, err := os.OpenFile(dbPath, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
