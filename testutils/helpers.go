@@ -20,8 +20,15 @@ func AssertNoError(t testing.TB, err error) {
 
 func AssertEquals[T any](t testing.TB, got, want T) {
 	t.Helper()
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %v, want %v", got, want)
+	switch v := any(got).(type) {
+	case string, int, int64, float64, bool:
+		if v != any(want) {
+			t.Errorf("got %v, want %v", got, want)
+		}
+	default:
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got %v, want %v", got, want)
+		}
 	}
 }
 
