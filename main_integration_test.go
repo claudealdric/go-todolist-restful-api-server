@@ -37,7 +37,7 @@ func TestServer(t *testing.T) {
 		server.ServeHTTP(httptest.NewRecorder(), request)
 	}
 
-	t.Run("responds with a 200 OK status on the root path", func(t *testing.T) {
+	t.Run("responds with a 200 OK status on GET `/`", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
 		testutils.AssertNoError(t, err)
 		response := httptest.NewRecorder()
@@ -45,7 +45,7 @@ func TestServer(t *testing.T) {
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 	})
 
-	t.Run("responds with a 404 not found status on the root path", func(t *testing.T) {
+	t.Run("responds with a 404 not found status on an invalid path", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/not-found", nil)
 		testutils.AssertNoError(t, err)
 		response := httptest.NewRecorder()
@@ -53,7 +53,7 @@ func TestServer(t *testing.T) {
 		testutils.AssertStatus(t, response.Code, http.StatusNotFound)
 	})
 
-	t.Run("returns a slice of tasks with GET on `/tasks`", func(t *testing.T) {
+	t.Run("returns a slice of tasks with GET `/tasks`", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/tasks", nil)
 		testutils.AssertNoError(t, err)
 		response := httptest.NewRecorder()
