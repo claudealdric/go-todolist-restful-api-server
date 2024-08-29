@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
@@ -44,8 +45,7 @@ func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(w).Encode(task)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		log.Printf("error encoding response: %v", err)
 	}
 }
 
