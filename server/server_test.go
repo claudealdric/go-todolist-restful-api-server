@@ -1,6 +1,8 @@
 package server
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -51,33 +53,53 @@ func TestServer(t *testing.T) {
 		testutils.AssertEquals(t, got, want)
 	})
 
-	t.Run("responds with a 201 status created with POST on `/tasks`", func(t *testing.T) {
+	t.Run("creates and returns the task with a 201 status created with POST on `/tasks`", func(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
-		request, err := http.NewRequest(http.MethodPost, "/tasks", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
+		newTask := models.Task{Title: "Exercise"}
+		jsonData, err := json.Marshal(newTask)
+		testutils.AssertNoError(t, err)
+		request, err := http.NewRequest(
+			http.MethodPost,
+			"/tasks",
+			bytes.NewBuffer(jsonData),
+		)
+		testutils.AssertNoError(t, err)
 
 		response := httptest.NewRecorder()
 		handler := http.HandlerFunc(server.HandlePostTasks)
 		handler.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusCreated)
+
+		if datastore.createTaskCalls != 1 {
+			t.Errorf("got %d, want %d", datastore.createTaskCalls, 1)
+		}
+
+		got := testutils.GetTaskFromResponse(t, response.Body)
+		want := newTask
+		testutils.AssertEquals(t, got, want)
+
 	})
 }
 
 var initialTasks = []models.Task{{Title: "Pack clothes"}}
 
 type mockDataStore struct {
-	getTasksCalls int
-	tasks         []models.Task
+	createTaskCalls int
+	getTasksCalls   int
+	tasks           []models.Task
 }
 
 func newMockDataStore() *mockDataStore {
 	m := mockDataStore{}
 	m.tasks = initialTasks
 	return &m
+}
+
+func (m *mockDataStore) CreateTask(task models.Task) models.Task {
+	m.createTaskCalls++
+	return task
 }
 
 func (m *mockDataStore) GetTasks() []models.Task {

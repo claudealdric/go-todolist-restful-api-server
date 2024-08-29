@@ -51,6 +51,21 @@ func CreateTempFile(t testing.TB, initialData string) (*os.File, func()) {
 	return tempFile, removeFile
 }
 
+func GetTaskFromResponse(t *testing.T, body io.Reader) (tasks models.Task) {
+	t.Helper()
+	err := json.NewDecoder(body).Decode(&tasks)
+
+	if err != nil {
+		t.Fatalf(
+			"unable to parse response from server %q into Task: %v",
+			body,
+			err,
+		)
+	}
+
+	return tasks
+}
+
 func GetTasksFromResponse(t *testing.T, body io.Reader) (tasks []models.Task) {
 	t.Helper()
 	err := json.NewDecoder(body).Decode(&tasks)

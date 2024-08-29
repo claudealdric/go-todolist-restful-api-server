@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
+	"github.com/claudealdric/go-todolist-restful-api-server/models"
 )
 
 type Server struct {
@@ -33,7 +34,19 @@ func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
+	var task models.Task
+	err := json.NewDecoder(r.Body).Decode(&task)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	task = s.store.CreateTask(task)
 	w.WriteHeader(http.StatusCreated)
+	err = json.NewEncoder(w).Encode(task)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) HandleRoot(w http.ResponseWriter, r *http.Request) {
