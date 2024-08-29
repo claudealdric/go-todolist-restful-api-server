@@ -15,8 +15,7 @@ type Server struct {
 }
 
 func NewServer(store datastore.DataStore) *Server {
-	server := new(Server)
-	server.store = store
+	server := &Server{store: store}
 	router := NewRouter(server)
 	server.Handler = router
 	return server
