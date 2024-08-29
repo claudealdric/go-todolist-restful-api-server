@@ -41,6 +41,12 @@ func (f *FileSystemDataStore) GetTasks() []models.Task {
 	return f.tasks
 }
 
+func (f *FileSystemDataStore) CreateTask(task models.Task) models.Task {
+	f.tasks = append(f.tasks, task)
+	f.database.Encode(f.tasks)
+	return task
+}
+
 func initializeDBFile(file *os.File) error {
 	_, err := file.Seek(0, io.SeekStart)
 

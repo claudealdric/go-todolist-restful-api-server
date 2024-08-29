@@ -2,6 +2,7 @@ package datastore_test
 
 import (
 	"encoding/json"
+	"slices"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
@@ -24,11 +25,23 @@ func TestFileSystemDataStore(t *testing.T) {
 		testutils.AssertNoError(t, err)
 	})
 
-	t.Run("returns the stored tasks", func(t *testing.T) {
+	t.Run("GetTasks returns the stored tasks", func(t *testing.T) {
 		store, err := datastore.NewFileSystemDataStore(database)
 		testutils.AssertNoError(t, err)
 		testutils.AssertEquals(t, store.GetTasks(), wantedTasks)
 	})
+
+	t.Run("CreateTask stores and returns the created task", func(t *testing.T) {
+		store, err := datastore.NewFileSystemDataStore(database)
+		testutils.AssertNoError(t, err)
+		newTask := models.Task{Title: "Launder clothes"}
+		store.CreateTask(newTask)
+		tasks := store.GetTasks()
+		if !slices.Contains(tasks, newTask) {
+			t.Errorf("missing task '%v' from tasks '%v'", newTask, tasks)
+		}
+	})
+
 }
 
 func ConvertToJSON(tasks []models.Task) (string, error) {
