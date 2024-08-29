@@ -11,8 +11,8 @@ import (
 )
 
 func TestFileSystemDataStore(t *testing.T) {
-	wantedTasks := []models.Task{{Title: "Buy groceries"}}
-	jsonTasks, err := utils.ConvertToJSON(wantedTasks)
+	initialTasks := []models.Task{{Title: "Buy groceries"}}
+	jsonTasks, err := utils.ConvertToJSON(initialTasks)
 	testutils.AssertNoError(t, err)
 	database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
 	defer cleanDatabase()
@@ -28,7 +28,7 @@ func TestFileSystemDataStore(t *testing.T) {
 	t.Run("GetTasks returns the stored tasks", func(t *testing.T) {
 		store, err := datastore.NewFileSystemDataStore(database)
 		testutils.AssertNoError(t, err)
-		testutils.AssertEquals(t, store.GetTasks(), wantedTasks)
+		testutils.AssertEquals(t, store.GetTasks(), initialTasks)
 	})
 
 	t.Run("CreateTask stores and returns the created task", func(t *testing.T) {
