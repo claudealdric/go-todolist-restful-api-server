@@ -81,6 +81,28 @@ func TestServer(t *testing.T) {
 		testutils.AssertEquals(t, got, want)
 
 	})
+
+	t.Run("responds with a 400 Bad Request given an invalid body with POST on `/tasks`", func(t *testing.T) {
+		datastore := newMockDataStore()
+		server := NewServer(datastore)
+
+		invalidJson := `{`
+		request, err := http.NewRequest(
+			http.MethodPost,
+			"/tasks",
+			bytes.NewBuffer([]byte(invalidJson)),
+		)
+		testutils.AssertNoError(t, err)
+
+		response := httptest.NewRecorder()
+		handler := http.HandlerFunc(server.HandlePostTasks)
+		handler.ServeHTTP(response, request)
+		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
+
+		if datastore.createTaskCalls != 0 {
+			t.Errorf("got %d, want %d", datastore.createTaskCalls, 0)
+		}
+	})
 }
 
 var initialTasks = []models.Task{{Title: "Pack clothes"}}

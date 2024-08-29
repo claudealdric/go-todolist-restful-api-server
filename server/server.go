@@ -38,7 +38,7 @@ func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
 	var task models.Task
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	task = s.store.CreateTask(task)
