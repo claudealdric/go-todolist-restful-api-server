@@ -24,26 +24,21 @@ func NewServer(store datastore.DataStore) *Server {
 func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	tasks := s.store.GetTasks()
-	err := json.NewEncoder(w).Encode(tasks)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(tasks); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
-
 }
 
 func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	var task models.Task
-	err := json.NewDecoder(r.Body).Decode(&task)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	task = s.store.CreateTask(task)
 	w.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(w).Encode(task)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(task); err != nil {
 		log.Printf("error encoding response: %v", err)
 	}
 }
