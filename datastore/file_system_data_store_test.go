@@ -1,20 +1,20 @@
 package datastore_test
 
 import (
-	"encoding/json"
 	"slices"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
+	"github.com/claudealdric/go-todolist-restful-api-server/utils"
 )
 
 func TestFileSystemDataStore(t *testing.T) {
 	wantedTasks := []models.Task{{Title: "Buy groceries"}}
-	jsonTasks, err := ConvertToJSON(wantedTasks)
+	jsonTasks, err := utils.ConvertToJSON(wantedTasks)
 	testutils.AssertNoError(t, err)
-	database, cleanDatabase := testutils.CreateTempFile(t, jsonTasks)
+	database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
 	defer cleanDatabase()
 
 	t.Run("works with an empty file", func(t *testing.T) {
@@ -42,12 +42,4 @@ func TestFileSystemDataStore(t *testing.T) {
 		}
 	})
 
-}
-
-func ConvertToJSON(tasks []models.Task) (string, error) {
-	jsonData, err := json.Marshal(tasks)
-	if err != nil {
-		return "", err
-	}
-	return string(jsonData), nil
 }
