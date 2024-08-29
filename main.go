@@ -19,6 +19,9 @@ func main() {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
 	store, err := datastore.NewFileSystemDataStore(dbFile)
+	if err != nil {
+		log.Fatalf("problem creating file system data store: %v", err)
+	}
 	server := server.NewServer(store)
 	log.Printf("Starting server on port %d", port)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), server)
