@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -13,15 +15,28 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	// TODO: start with an empty database
-	dbFile, cleanDatabase := testutils.CreateTempFile(
-		t,
-		`[{"title": "Buy groceries"}]`,
-	)
+	dbFile, cleanDatabase := testutils.CreateTempFile(t, `[]`)
 	defer cleanDatabase()
 	store, err := datastore.NewFileSystemDataStore(dbFile)
 	testutils.AssertNoError(t, err)
 	server := server.NewServer(store)
+
+	wantedTasks := []models.Task{
+		{Title: "Buy groceries"},
+		{Title: "Pack clothes"},
+	}
+
+	for _, task := range wantedTasks {
+		jsonBody, err := json.Marshal(task)
+		testutils.AssertNoError(t, err)
+		request, err := http.NewRequest(
+			http.MethodPost,
+			"/tasks",
+			bytes.NewBuffer(jsonBody),
+		)
+		testutils.AssertNoError(t, err)
+		server.ServeHTTP(httptest.NewRecorder(), request)
+	}
 
 	t.Run("responds with a 200 OK status on the root path", func(t *testing.T) {
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
@@ -47,10 +62,9 @@ func TestServer(t *testing.T) {
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 
 		got := testutils.GetTasksFromResponse(t, response.Body)
-		want := []models.Task{{Title: "Buy groceries"}}
 
-		if !reflect.DeepEqual(got, want) {
-			t.Errorf("got %+v, want %+v", got, want)
+		if !reflect.DeepEqual(got, wantedTasks) {
+			t.Errorf("got %+v, want %+v", got, wantedTasks)
 		}
 	})
 }
