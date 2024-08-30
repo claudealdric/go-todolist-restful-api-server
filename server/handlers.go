@@ -28,7 +28,14 @@ func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
 func (s *Server) HandleGetTaskById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	id, err := strconv.Atoi(r.PathValue("id"))
-	_ = err
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("ID: %q is invalid", r.PathValue("id")),
+			http.StatusBadRequest,
+		)
+		return
+	}
 	task, err := s.store.GetTaskById(id)
 	_ = json.NewEncoder(w).Encode(task) // TODO: handle error
 }

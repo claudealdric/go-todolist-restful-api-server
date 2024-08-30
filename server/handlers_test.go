@@ -123,6 +123,23 @@ func TestHandleGetTaskById(t *testing.T) {
 			wantedTask,
 		)
 	})
+
+	t.Run("responds with a 400 Bad Request when given non-integer ID", func(t *testing.T) {
+		data := newMockStore(false)
+		server := NewServer(data)
+
+		invalidId := "not-an-integer"
+		request := httptest.NewRequest(
+			http.MethodGet,
+			fmt.Sprintf("/tasks/%s", invalidId),
+			nil,
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusBadRequest)
+		assert.Calls(t, data.getTaskByIdCalls, 0)
+	})
 }
 
 func TestHandleGetTasks(t *testing.T) {
