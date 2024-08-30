@@ -7,11 +7,11 @@ import (
 )
 
 type Server struct {
-	store data.DataStore
+	store data.Store
 	http.Handler
 }
 
-func NewServer(store data.DataStore) *Server {
+func NewServer(store data.Store) *Server {
 	server := &Server{store: store}
 	router := NewRouter(server)
 	server.Handler = router
