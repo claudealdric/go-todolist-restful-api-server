@@ -37,7 +37,15 @@ func (s *Server) HandleGetTaskById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	task, err := s.store.GetTaskById(id)
-	_ = json.NewEncoder(w).Encode(task) // TODO: handle error
+	err = json.NewEncoder(w).Encode(task)
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("ID: %q is invalid", r.PathValue("id")),
+			http.StatusBadRequest,
+		)
+		return
+	}
 }
 
 func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
