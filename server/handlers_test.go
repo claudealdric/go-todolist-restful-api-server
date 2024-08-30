@@ -96,6 +96,35 @@ func TestHandleDeleteTaskById(t *testing.T) {
 	// })
 }
 
+func TestHandleGetTaskById(t *testing.T) {
+	t.Run("returns the wanted task if it exists", func(t *testing.T) {
+		data := newMockStore(false)
+		server := NewServer(data)
+
+		wantedTask := initialTasks[0]
+		request := httptest.NewRequest(
+			http.MethodGet,
+			fmt.Sprintf("/tasks/%d", wantedTask.Id),
+			nil,
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.ContentType(
+			t,
+			testutils.GetContentTypeFromResponse(response),
+			jsonContentType,
+		)
+		assert.Status(t, response.Code, http.StatusOK)
+		assert.Calls(t, data.getTaskByIdCalls, 1)
+		assert.Equals(
+			t,
+			testutils.GetTaskFromResponse(t, response.Body),
+			wantedTask,
+		)
+	})
+}
+
 func TestHandleGetTasks(t *testing.T) {
 	t.Run("returns the stored tasks", func(t *testing.T) {
 		data := newMockStore(false)

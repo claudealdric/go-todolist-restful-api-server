@@ -26,10 +26,11 @@ func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleGetTaskById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", jsonContentType)
 	id, err := strconv.Atoi(r.PathValue("id"))
 	_ = err
 	task, err := s.store.GetTaskById(id)
-	_ = task
+	_ = json.NewEncoder(w).Encode(task) // TODO: handle error
 }
 
 func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
