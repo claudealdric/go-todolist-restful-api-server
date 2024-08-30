@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
-	store, err := data.NewFileSystemDataStore(dbFile)
+	store, err := data.NewFileSystemStore(dbFile)
 	if err != nil {
 		log.Fatalf("problem creating file system data store: %v", err)
 	}

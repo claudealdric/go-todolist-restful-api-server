@@ -10,7 +10,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/utils"
 )
 
-func TestFileSystemDataStore(t *testing.T) {
+func TestFileSystemStore(t *testing.T) {
 	initialTasks := []models.Task{{1, "Buy groceries"}}
 	jsonTasks, err := utils.ConvertToJSON(initialTasks)
 
@@ -20,7 +20,7 @@ func TestFileSystemDataStore(t *testing.T) {
 		database, cleanDatabase := testutils.CreateTempFile(t, "")
 		defer cleanDatabase()
 
-		_, err := data.NewFileSystemDataStore(database)
+		_, err := data.NewFileSystemStore(database)
 
 		assert.NoError(t, err)
 	})
@@ -29,7 +29,7 @@ func TestFileSystemDataStore(t *testing.T) {
 		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
 		defer cleanDatabase()
 
-		store, err := data.NewFileSystemDataStore(database)
+		store, err := data.NewFileSystemStore(database)
 
 		assert.NoError(t, err)
 
@@ -43,7 +43,7 @@ func TestFileSystemDataStore(t *testing.T) {
 		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
 		defer cleanDatabase()
 
-		store, err := data.NewFileSystemDataStore(database)
+		store, err := data.NewFileSystemStore(database)
 
 		assert.NoError(t, err)
 
@@ -59,7 +59,7 @@ func TestFileSystemDataStore(t *testing.T) {
 		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
 		defer cleanDatabase()
 
-		store, err := data.NewFileSystemDataStore(database)
+		store, err := data.NewFileSystemStore(database)
 
 		assert.NoError(t, err)
 

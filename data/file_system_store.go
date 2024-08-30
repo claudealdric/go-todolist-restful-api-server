@@ -10,12 +10,12 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 )
 
-type FileSystemDataStore struct {
+type FileSystemStore struct {
 	encoder *json.Encoder
 	decoder *json.Decoder
 }
 
-func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
+func NewFileSystemStore(file *os.File) (*FileSystemStore, error) {
 	err := initializeDBFile(file)
 
 	if err != nil {
@@ -30,13 +30,13 @@ func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
 		)
 	}
 
-	return &FileSystemDataStore{
+	return &FileSystemStore{
 		json.NewEncoder(&tape{file}),
 		json.NewDecoder(&tape{file}),
 	}, nil
 }
 
-func (f *FileSystemDataStore) GetTasks() ([]models.Task, error) {
+func (f *FileSystemStore) GetTasks() ([]models.Task, error) {
 	tasks, err := f.getTasksFromFile()
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (f *FileSystemDataStore) GetTasks() ([]models.Task, error) {
 	return tasks, nil
 }
 
-func (f *FileSystemDataStore) CreateTask(task models.Task) (models.Task, error) {
+func (f *FileSystemStore) CreateTask(task models.Task) (models.Task, error) {
 	tasks, err := f.GetTasks()
 	if err != nil {
 		return models.Task{}, err
@@ -57,7 +57,7 @@ func (f *FileSystemDataStore) CreateTask(task models.Task) (models.Task, error) 
 	return task, nil
 }
 
-func (f *FileSystemDataStore) DeleteTaskById(id int) error {
+func (f *FileSystemStore) DeleteTaskById(id int) error {
 	tasks, err := f.GetTasks()
 	if err != nil {
 		return err
@@ -68,7 +68,7 @@ func (f *FileSystemDataStore) DeleteTaskById(id int) error {
 	return f.overwriteFile(tasks)
 }
 
-func (f *FileSystemDataStore) getTasksFromFile() ([]models.Task, error) {
+func (f *FileSystemStore) getTasksFromFile() ([]models.Task, error) {
 	var tasks []models.Task
 	err := f.decoder.Decode(&tasks)
 	if err != nil {
@@ -77,7 +77,7 @@ func (f *FileSystemDataStore) getTasksFromFile() ([]models.Task, error) {
 	return tasks, nil
 }
 
-func (f *FileSystemDataStore) overwriteFile(data any) error {
+func (f *FileSystemStore) overwriteFile(data any) error {
 	err := f.encoder.Encode(data)
 	if err != nil {
 		return fmt.Errorf("error writing to file: %w", err)

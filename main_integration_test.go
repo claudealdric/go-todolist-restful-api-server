@@ -18,7 +18,7 @@ import (
 func TestServer(t *testing.T) {
 	dbFile, cleanDatabase := testutils.CreateTempFile(t, `[]`)
 	defer cleanDatabase()
-	store, err := data.NewFileSystemDataStore(dbFile)
+	store, err := data.NewFileSystemStore(dbFile)
 	assert.NoError(t, err)
 	server := server.NewServer(store)
 
