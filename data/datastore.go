@@ -1,4 +1,4 @@
-package datastore
+package data
 
 import "github.com/claudealdric/go-todolist-restful-api-server/models"
 

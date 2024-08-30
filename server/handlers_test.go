@@ -17,8 +17,8 @@ import (
 
 func TestHandleRoot(t *testing.T) {
 	t.Run("responds with 200 OK status", func(t *testing.T) {
-		datastore := newMockDataStore(false)
-		server := NewServer(datastore)
+		data := newMockDataStore(false)
+		server := NewServer(data)
 
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
 		response := httptest.NewRecorder()
@@ -30,10 +30,10 @@ func TestHandleRoot(t *testing.T) {
 
 func TestHandleDeleteTaskById(t *testing.T) {
 	t.Run("deletes the task and responds with 204 No Content", func(t *testing.T) {
-		datastore := newMockDataStore(false)
-		server := NewServer(datastore)
+		data := newMockDataStore(false)
+		server := NewServer(data)
 
-		tasks, err := datastore.GetTasks()
+		tasks, err := data.GetTasks()
 		assert.NoError(t, err)
 		initialTasksCount := len(tasks)
 		if initialTasksCount == 0 {
@@ -51,7 +51,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		server.Handler.ServeHTTP(response, request)
 		assert.Status(t, response.Code, http.StatusNoContent)
 
-		tasks, err = datastore.GetTasks()
+		tasks, err = data.GetTasks()
 		assert.NoError(t, err)
 		if len(tasks) != initialTasksCount-1 {
 			t.Errorf(
@@ -63,8 +63,8 @@ func TestHandleDeleteTaskById(t *testing.T) {
 	})
 
 	t.Run("responds with a 400 Bad Request when sending a non-integer ID", func(t *testing.T) {
-		datastore := newMockDataStore(false)
-		server := NewServer(datastore)
+		data := newMockDataStore(false)
+		server := NewServer(data)
 
 		request := httptest.NewRequest(
 			http.MethodDelete,
@@ -79,8 +79,8 @@ func TestHandleDeleteTaskById(t *testing.T) {
 
 	// TODO: implement after "get by ID" is implemented
 	// t.Run("responds with 404 Not Found when the task does not exist", func(t *testing.T) {
-	// datastore := newMockDataStore()
-	// server := NewServer(datastore)
+	// data := newMockDataStore()
+	// server := NewServer(data)
 	//
 	// taskToDelete := models.Task{100, "Does not exist"}
 	// request := httptest.NewRequest(
@@ -97,8 +97,8 @@ func TestHandleDeleteTaskById(t *testing.T) {
 
 func TestHandleGetTasks(t *testing.T) {
 	t.Run("returns the stored tasks", func(t *testing.T) {
-		datastore := newMockDataStore(false)
-		server := NewServer(datastore)
+		data := newMockDataStore(false)
+		server := NewServer(data)
 
 		request := httptest.NewRequest(http.MethodGet, "/tasks", nil)
 		response := httptest.NewRecorder()
@@ -110,7 +110,7 @@ func TestHandleGetTasks(t *testing.T) {
 			jsonContentType,
 		)
 		assert.Status(t, response.Code, http.StatusOK)
-		assert.Calls(t, datastore.getTasksCalls, 1)
+		assert.Calls(t, data.getTasksCalls, 1)
 		assert.Equals(
 			t,
 			testutils.GetTasksFromResponse(t, response.Body),
@@ -119,22 +119,22 @@ func TestHandleGetTasks(t *testing.T) {
 	})
 
 	t.Run("responds with a 500 error when getting tasks from the store errors", func(t *testing.T) {
-		datastore := newMockDataStore(true)
-		server := NewServer(datastore)
+		data := newMockDataStore(true)
+		server := NewServer(data)
 
 		request := httptest.NewRequest(http.MethodGet, "/tasks", nil)
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
 		assert.Status(t, response.Code, http.StatusInternalServerError)
-		assert.Calls(t, datastore.getTasksCalls, 1)
+		assert.Calls(t, data.getTasksCalls, 1)
 	})
 }
 
 func TestHandlePostTasks(t *testing.T) {
 	t.Run("creates and returns the task with a 201 Status Created", func(t *testing.T) {
-		datastore := newMockDataStore(false)
-		server := NewServer(datastore)
+		data := newMockDataStore(false)
+		server := NewServer(data)
 
 		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
@@ -153,7 +153,7 @@ func TestHandlePostTasks(t *testing.T) {
 			jsonContentType,
 		)
 		assert.Status(t, response.Code, http.StatusCreated)
-		assert.Calls(t, datastore.createTaskCalls, 1)
+		assert.Calls(t, data.createTaskCalls, 1)
 		assert.Equals(
 			t,
 			testutils.GetTaskFromResponse(t, response.Body),
@@ -162,8 +162,8 @@ func TestHandlePostTasks(t *testing.T) {
 	})
 
 	t.Run("responds with a 400 Bad Request given an invalid body", func(t *testing.T) {
-		datastore := newMockDataStore(false)
-		server := NewServer(datastore)
+		data := newMockDataStore(false)
+		server := NewServer(data)
 
 		invalidJson := `{`
 		request := httptest.NewRequest(
@@ -175,12 +175,12 @@ func TestHandlePostTasks(t *testing.T) {
 		server.Handler.ServeHTTP(response, request)
 
 		assert.Status(t, response.Code, http.StatusBadRequest)
-		assert.Calls(t, datastore.createTaskCalls, 0)
+		assert.Calls(t, data.createTaskCalls, 0)
 	})
 
 	t.Run("responds with a 500 error when the store task creation fails", func(t *testing.T) {
-		datastore := newMockDataStore(true)
-		server := NewServer(datastore)
+		data := newMockDataStore(true)
+		server := NewServer(data)
 
 		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
@@ -194,7 +194,7 @@ func TestHandlePostTasks(t *testing.T) {
 		server.Handler.ServeHTTP(response, request)
 
 		assert.Status(t, response.Code, http.StatusInternalServerError)
-		assert.Calls(t, datastore.createTaskCalls, 1)
+		assert.Calls(t, data.createTaskCalls, 1)
 	})
 }
 

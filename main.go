@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
+	"github.com/claudealdric/go-todolist-restful-api-server/data"
 	"github.com/claudealdric/go-todolist-restful-api-server/server"
 )
 
@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("problem opening %s %v", dbFileName, err)
 	}
-	store, err := datastore.NewFileSystemDataStore(dbFile)
+	store, err := data.NewFileSystemDataStore(dbFile)
 	if err != nil {
 		log.Fatalf("problem creating file system data store: %v", err)
 	}

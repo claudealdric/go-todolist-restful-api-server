@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
+	"github.com/claudealdric/go-todolist-restful-api-server/data"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/server"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
@@ -18,7 +18,7 @@ import (
 func TestServer(t *testing.T) {
 	dbFile, cleanDatabase := testutils.CreateTempFile(t, `[]`)
 	defer cleanDatabase()
-	store, err := datastore.NewFileSystemDataStore(dbFile)
+	store, err := data.NewFileSystemDataStore(dbFile)
 	assert.NoError(t, err)
 	server := server.NewServer(store)
 
