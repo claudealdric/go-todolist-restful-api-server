@@ -7,8 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/claudealdric/go-todolist-restful-api-server/api"
 	"github.com/claudealdric/go-todolist-restful-api-server/data"
-	"github.com/claudealdric/go-todolist-restful-api-server/server"
 )
 
 const port = 8080
@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("problem creating file system data store: %v", err)
 	}
-	server := server.NewServer(store)
+	server := api.NewServer(store)
 	log.Printf("Starting server on port %d", port)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), server)
 	log.Fatal(err)

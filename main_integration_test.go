@@ -8,9 +8,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/claudealdric/go-todolist-restful-api-server/api"
 	"github.com/claudealdric/go-todolist-restful-api-server/data"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
-	"github.com/claudealdric/go-todolist-restful-api-server/server"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
 )
@@ -20,7 +20,7 @@ func TestServer(t *testing.T) {
 	defer cleanDatabase()
 	store, err := data.NewFileSystemStore(dbFile)
 	assert.NoError(t, err)
-	server := server.NewServer(store)
+	server := api.NewServer(store)
 
 	initialTasks := []models.Task{
 		{1, "Buy groceries"},
@@ -88,14 +88,14 @@ func TestServer(t *testing.T) {
 	})
 }
 
-func sendGetTasks(server *server.Server) *httptest.ResponseRecorder {
+func sendGetTasks(server *api.Server) *httptest.ResponseRecorder {
 	request := httptest.NewRequest(http.MethodGet, "/tasks", nil)
 	response := httptest.NewRecorder()
 	server.ServeHTTP(response, request)
 	return response
 }
 
-func sendPostTask(server *server.Server, task models.Task) (*httptest.ResponseRecorder, error) {
+func sendPostTask(server *api.Server, task models.Task) (*httptest.ResponseRecorder, error) {
 	jsonBody, err := json.Marshal(task)
 	if err != nil {
 		return nil, err
