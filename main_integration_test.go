@@ -14,7 +14,6 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 )
 
-// TODO: use httptest.NewRequest
 func TestServer(t *testing.T) {
 	dbFile, cleanDatabase := testutils.CreateTempFile(t, `[]`)
 	defer cleanDatabase()
@@ -33,16 +32,14 @@ func TestServer(t *testing.T) {
 	}
 
 	t.Run("responds with a 200 OK status on GET `/`", func(t *testing.T) {
-		request, err := http.NewRequest(http.MethodGet, "/", nil)
-		testutils.AssertNoError(t, err)
+		request := httptest.NewRequest(http.MethodGet, "/", nil)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 	})
 
 	t.Run("responds with a 404 not found status on an invalid path", func(t *testing.T) {
-		request, err := http.NewRequest(http.MethodGet, "/not-found", nil)
-		testutils.AssertNoError(t, err)
+		request := httptest.NewRequest(http.MethodGet, "/not-found", nil)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusNotFound)
@@ -89,14 +86,11 @@ func sendPostTask(server *server.Server, task models.Task) (*httptest.ResponseRe
 	if err != nil {
 		return nil, err
 	}
-	request, err := http.NewRequest(
+	request := httptest.NewRequest(
 		http.MethodPost,
 		"/tasks",
 		bytes.NewBuffer(jsonBody),
 	)
-	if err != nil {
-		return nil, err
-	}
 	response := httptest.NewRecorder()
 	server.ServeHTTP(response, request)
 	return response, nil
