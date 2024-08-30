@@ -43,9 +43,11 @@ func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 	tasks, err := s.store.GetTasks()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	if err := json.NewEncoder(w).Encode(tasks); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }
 
