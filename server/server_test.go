@@ -13,7 +13,6 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 )
 
-// TODO: remove the extraneous handler; use `server.Handler.ServeHTTP` instead
 func TestHandleRoot(t *testing.T) {
 	t.Run("responds with 200 OK status", func(t *testing.T) {
 		datastore := newMockDataStore()
@@ -25,8 +24,7 @@ func TestHandleRoot(t *testing.T) {
 		}
 
 		response := httptest.NewRecorder()
-		handler := http.HandlerFunc(server.HandleRoot)
-		handler.ServeHTTP(response, request)
+		server.Handler.ServeHTTP(response, request)
 
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
 	})
@@ -75,8 +73,7 @@ func TestHandleGetTasks(t *testing.T) {
 		}
 
 		response := httptest.NewRecorder()
-		handler := http.HandlerFunc(server.HandleGetTasks)
-		handler.ServeHTTP(response, request)
+		server.Handler.ServeHTTP(response, request)
 
 		testutils.AssertContentType(
 			t,
@@ -109,8 +106,7 @@ func TestHandlePostTasks(t *testing.T) {
 		testutils.AssertNoError(t, err)
 
 		response := httptest.NewRecorder()
-		handler := http.HandlerFunc(server.HandlePostTasks)
-		handler.ServeHTTP(response, request)
+		server.Handler.ServeHTTP(response, request)
 
 		testutils.AssertContentType(
 			t,
@@ -139,8 +135,7 @@ func TestHandlePostTasks(t *testing.T) {
 		testutils.AssertNoError(t, err)
 
 		response := httptest.NewRecorder()
-		handler := http.HandlerFunc(server.HandlePostTasks)
-		handler.ServeHTTP(response, request)
+		server.Handler.ServeHTTP(response, request)
 
 		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
 		testutils.AssertCalls(t, datastore.createTaskCalls, 0)
