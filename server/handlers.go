@@ -25,6 +25,13 @@ func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func (s *Server) HandleGetTaskById(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	_ = err
+	task, err := s.store.GetTaskById(id)
+	_ = task
+}
+
 func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	tasks, err := s.store.GetTasks()

@@ -13,6 +13,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
+	"github.com/claudealdric/go-todolist-restful-api-server/utils"
 )
 
 func TestHandleRoot(t *testing.T) {
@@ -201,10 +202,11 @@ func TestHandlePostTasks(t *testing.T) {
 var initialTasks = []models.Task{{1, "Pack clothes"}}
 
 type mockStore struct {
-	createTaskCalls int
-	getTasksCalls   int
-	tasks           []models.Task
-	shouldError     bool
+	createTaskCalls  int
+	getTaskByIdCalls int
+	getTasksCalls    int
+	tasks            []models.Task
+	shouldError      bool
 }
 
 func newMockStore(shouldError bool) *mockStore {
@@ -217,6 +219,15 @@ func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
 	if m.shouldError {
 		return models.Task{}, errors.New("forced error")
 	}
+	return task, nil
+}
+
+func (m *mockStore) GetTaskById(id int) (models.Task, error) {
+	m.getTaskByIdCalls++
+	tasks, _ := m.GetTasks()
+	task, _ := utils.SliceFind(tasks, func(t models.Task) bool {
+		return t.Id == id
+	})
 	return task, nil
 }
 
