@@ -153,8 +153,9 @@ func (m *mockDataStore) GetTasks() []models.Task {
 	return m.tasks
 }
 
-func (m *mockDataStore) DeleteTaskById(id int) {
+func (m *mockDataStore) DeleteTaskById(id int) error {
 	m.tasks = slices.DeleteFunc(m.tasks, func(task models.Task) bool {
 		return task.Id == id
 	})
+	return nil
 }

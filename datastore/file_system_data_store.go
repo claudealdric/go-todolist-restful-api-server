@@ -50,11 +50,11 @@ func (f *FileSystemDataStore) CreateTask(task models.Task) (models.Task, error) 
 	return task, nil
 }
 
-func (f *FileSystemDataStore) DeleteTaskById(id int) {
+func (f *FileSystemDataStore) DeleteTaskById(id int) error {
 	tasks := slices.DeleteFunc(f.GetTasks(), func(task models.Task) bool {
 		return task.Id == id
 	})
-	f.overwriteFile(tasks)
+	return f.overwriteFile(tasks)
 }
 
 func (f *FileSystemDataStore) getTasksFromFile() ([]models.Task, error) {
