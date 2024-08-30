@@ -23,6 +23,10 @@ func NewServer(store datastore.DataStore) *Server {
 	return server
 }
 
+func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	tasks := s.store.GetTasks()

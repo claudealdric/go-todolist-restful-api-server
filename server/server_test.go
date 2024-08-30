@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,6 +27,27 @@ func TestHandleRoot(t *testing.T) {
 		handler.ServeHTTP(response, request)
 
 		testutils.AssertStatus(t, response.Code, http.StatusOK)
+	})
+}
+
+func TestHandleDeleteTaskById(t *testing.T) {
+	t.Run("responds with 204 No Content", func(t *testing.T) {
+		datastore := newMockDataStore()
+		server := NewServer(datastore)
+
+		request, err := http.NewRequest(
+			http.MethodPost,
+			fmt.Sprintf("/tasks/%d", initialTasks[0].Id),
+			nil,
+		)
+		testutils.AssertNoError(t, err)
+
+		response := httptest.NewRecorder()
+		handler := http.HandlerFunc(server.HandleDeleteTaskById)
+		handler.ServeHTTP(response, request)
+
+		testutils.AssertStatus(t, response.Code, http.StatusNoContent)
+		// testutils.AssertCalls(t, datastore.createTaskCalls, 1)
 	})
 }
 
