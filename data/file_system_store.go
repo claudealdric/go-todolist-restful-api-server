@@ -8,6 +8,7 @@ import (
 	"slices"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
+	"github.com/claudealdric/go-todolist-restful-api-server/utils"
 )
 
 type FileSystemStore struct {
@@ -42,13 +43,12 @@ func (f *FileSystemStore) GetTaskById(id int) (models.Task, error) {
 	if err != nil {
 		return task, err
 	}
-	i := slices.IndexFunc(tasks, func(task models.Task) bool {
-		return task.Id == id
+	task, ok := utils.SliceFind(tasks, func(t models.Task) bool {
+		return t.Id == id
 	})
-	if i == -1 {
+	if !ok {
 		return task, fmt.Errorf("task with ID: %d does not exist", task.Id)
 	}
-	task = tasks[i]
 	return task, nil
 }
 
