@@ -26,7 +26,7 @@ func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("content-type", jsonContentType)
 	tasks, err := s.store.GetTasks()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -39,7 +39,7 @@ func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("content-type", jsonContentType)
 	var task models.Task
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
