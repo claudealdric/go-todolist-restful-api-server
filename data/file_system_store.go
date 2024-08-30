@@ -47,7 +47,11 @@ func (f *FileSystemStore) GetTaskById(id int) (models.Task, error) {
 		return t.Id == id
 	})
 	if !ok {
-		return task, fmt.Errorf("task with ID: %d does not exist", task.Id)
+		return task, fmt.Errorf(
+			"task with ID %d: %w",
+			id,
+			ErrResourceNotFound,
+		)
 	}
 	return task, nil
 }

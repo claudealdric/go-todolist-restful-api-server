@@ -2,11 +2,13 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/claudealdric/go-todolist-restful-api-server/data"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 )
 
@@ -38,11 +40,16 @@ func (s *Server) HandleGetTaskById(w http.ResponseWriter, r *http.Request) {
 	}
 	task, err := s.store.GetTaskById(id)
 	if err != nil {
-		http.Error(
-			w,
-			fmt.Sprintf("Task with ID: %d not found", id),
-			http.StatusNotFound,
-		)
+		if errors.Is(err, data.ErrResourceNotFound) {
+			http.Error(
+				w,
+				err.Error(),
+				http.StatusNotFound,
+			)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
 		return
 	}
 	if err := json.NewEncoder(w).Encode(task); err != nil {

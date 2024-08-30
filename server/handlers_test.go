@@ -10,6 +10,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/claudealdric/go-todolist-restful-api-server/data"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
@@ -157,6 +158,23 @@ func TestHandleGetTaskById(t *testing.T) {
 		assert.Status(t, response.Code, http.StatusNotFound)
 		assert.Calls(t, data.getTaskByIdCalls, 1)
 	})
+
+	t.Run("responds with a 500 error when the task retrieval fails for an unknown reason", func(t *testing.T) {
+		data := newMockStore(true)
+		server := NewServer(data)
+
+		doesNotExistId := -2
+		request := httptest.NewRequest(
+			http.MethodGet,
+			fmt.Sprintf("/tasks/%d", doesNotExistId),
+			nil,
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusInternalServerError)
+		assert.Calls(t, data.getTaskByIdCalls, 1)
+	})
 }
 
 func TestHandleGetTasks(t *testing.T) {
@@ -289,7 +307,11 @@ func (m *mockStore) GetTaskById(id int) (models.Task, error) {
 	m.getTaskByIdCalls++
 	var task models.Task
 	if m.shouldError {
-		return task, errors.New("forced error")
+		if id == -1 {
+			return task, data.ErrResourceNotFound
+		} else {
+			return task, errors.New("forced error")
+		}
 	}
 	tasks, _ := m.GetTasks()
 	task, _ = utils.SliceFind(tasks, func(t models.Task) bool {
