@@ -79,22 +79,21 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		assert.Status(t, response.Code, http.StatusBadRequest)
 	})
 
-	// TODO: implement after "get by ID" is implemented
-	// t.Run("responds with 404 Not Found when the task does not exist", func(t *testing.T) {
-	// data := newMockStore()
-	// server := NewServer(data)
-	//
-	// taskToDelete := models.Task{100, "Does not exist"}
-	// request := httptest.NewRequest(
-	// 	http.MethodDelete,
-	// 	fmt.Sprintf("/tasks/%d", taskToDelete.Id),
-	// 	nil,
-	// )
-	// response := httptest.NewRecorder()
-	//
-	// server.Handler.ServeHTTP(response, request)
-	// assert.AssertStatus(t, response.Code, http.StatusNotFound)
-	// })
+	t.Run("responds with 404 Not Found when the task does not exist", func(t *testing.T) {
+		data := newMockStore(false)
+		server := NewServer(data)
+
+		taskToDelete := models.Task{-1, "Does not exist"}
+		request := httptest.NewRequest(
+			http.MethodDelete,
+			fmt.Sprintf("/tasks/%d", taskToDelete.Id),
+			nil,
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusNotFound)
+	})
 }
 
 func TestHandleGetTaskById(t *testing.T) {
@@ -329,6 +328,12 @@ func (m *mockStore) GetTasks() ([]models.Task, error) {
 }
 
 func (m *mockStore) DeleteTaskById(id int) error {
+	i := slices.IndexFunc(m.tasks, func(task models.Task) bool {
+		return task.Id == id
+	})
+	if i == -1 {
+		return data.ErrResourceNotFound
+	}
 	m.tasks = slices.DeleteFunc(m.tasks, func(task models.Task) bool {
 		return task.Id == id
 	})
