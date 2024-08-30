@@ -59,6 +59,23 @@ func TestHandleDeleteTaskById(t *testing.T) {
 			)
 		}
 	})
+
+	// TODO: implement
+	// t.Run("responds with 404 Not Found when the task does not exist", func(t *testing.T) {
+	// datastore := newMockDataStore()
+	// server := NewServer(datastore)
+	//
+	// taskToDelete := models.Task{100, "Does not exist"}
+	// request := httptest.NewRequest(
+	// 	http.MethodDelete,
+	// 	fmt.Sprintf("/tasks/%d", taskToDelete.Id),
+	// 	nil,
+	// )
+	// response := httptest.NewRecorder()
+	//
+	// server.Handler.ServeHTTP(response, request)
+	// testutils.AssertStatus(t, response.Code, http.StatusNotFound)
+	// })
 }
 
 func TestHandleGetTasks(t *testing.T) {
