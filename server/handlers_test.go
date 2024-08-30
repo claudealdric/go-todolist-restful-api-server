@@ -17,7 +17,7 @@ import (
 
 func TestHandleRoot(t *testing.T) {
 	t.Run("responds with 200 OK status", func(t *testing.T) {
-		data := newMockDataStore(false)
+		data := newMockStore(false)
 		server := NewServer(data)
 
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -30,7 +30,7 @@ func TestHandleRoot(t *testing.T) {
 
 func TestHandleDeleteTaskById(t *testing.T) {
 	t.Run("deletes the task and responds with 204 No Content", func(t *testing.T) {
-		data := newMockDataStore(false)
+		data := newMockStore(false)
 		server := NewServer(data)
 
 		tasks, err := data.GetTasks()
@@ -63,7 +63,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 	})
 
 	t.Run("responds with a 400 Bad Request when sending a non-integer ID", func(t *testing.T) {
-		data := newMockDataStore(false)
+		data := newMockStore(false)
 		server := NewServer(data)
 
 		request := httptest.NewRequest(
@@ -79,7 +79,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 
 	// TODO: implement after "get by ID" is implemented
 	// t.Run("responds with 404 Not Found when the task does not exist", func(t *testing.T) {
-	// data := newMockDataStore()
+	// data := newMockStore()
 	// server := NewServer(data)
 	//
 	// taskToDelete := models.Task{100, "Does not exist"}
@@ -97,7 +97,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 
 func TestHandleGetTasks(t *testing.T) {
 	t.Run("returns the stored tasks", func(t *testing.T) {
-		data := newMockDataStore(false)
+		data := newMockStore(false)
 		server := NewServer(data)
 
 		request := httptest.NewRequest(http.MethodGet, "/tasks", nil)
@@ -119,7 +119,7 @@ func TestHandleGetTasks(t *testing.T) {
 	})
 
 	t.Run("responds with a 500 error when getting tasks from the store errors", func(t *testing.T) {
-		data := newMockDataStore(true)
+		data := newMockStore(true)
 		server := NewServer(data)
 
 		request := httptest.NewRequest(http.MethodGet, "/tasks", nil)
@@ -133,7 +133,7 @@ func TestHandleGetTasks(t *testing.T) {
 
 func TestHandlePostTasks(t *testing.T) {
 	t.Run("creates and returns the task with a 201 Status Created", func(t *testing.T) {
-		data := newMockDataStore(false)
+		data := newMockStore(false)
 		server := NewServer(data)
 
 		newTask := models.Task{2, "Exercise"}
@@ -162,7 +162,7 @@ func TestHandlePostTasks(t *testing.T) {
 	})
 
 	t.Run("responds with a 400 Bad Request given an invalid body", func(t *testing.T) {
-		data := newMockDataStore(false)
+		data := newMockStore(false)
 		server := NewServer(data)
 
 		invalidJson := `{`
@@ -179,7 +179,7 @@ func TestHandlePostTasks(t *testing.T) {
 	})
 
 	t.Run("responds with a 500 error when the store task creation fails", func(t *testing.T) {
-		data := newMockDataStore(true)
+		data := newMockStore(true)
 		server := NewServer(data)
 
 		newTask := models.Task{2, "Exercise"}
@@ -200,19 +200,19 @@ func TestHandlePostTasks(t *testing.T) {
 
 var initialTasks = []models.Task{{1, "Pack clothes"}}
 
-type mockDataStore struct {
+type mockStore struct {
 	createTaskCalls int
 	getTasksCalls   int
 	tasks           []models.Task
 	shouldError     bool
 }
 
-func newMockDataStore(shouldError bool) *mockDataStore {
-	m := &mockDataStore{tasks: initialTasks, shouldError: shouldError}
+func newMockStore(shouldError bool) *mockStore {
+	m := &mockStore{tasks: initialTasks, shouldError: shouldError}
 	return m
 }
 
-func (m *mockDataStore) CreateTask(task models.Task) (models.Task, error) {
+func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
 	m.createTaskCalls++
 	if m.shouldError {
 		return models.Task{}, errors.New("forced error")
@@ -220,7 +220,7 @@ func (m *mockDataStore) CreateTask(task models.Task) (models.Task, error) {
 	return task, nil
 }
 
-func (m *mockDataStore) GetTasks() ([]models.Task, error) {
+func (m *mockStore) GetTasks() ([]models.Task, error) {
 	m.getTasksCalls++
 	if m.shouldError {
 		return nil, errors.New("forced error")
@@ -228,7 +228,7 @@ func (m *mockDataStore) GetTasks() ([]models.Task, error) {
 	return m.tasks, nil
 }
 
-func (m *mockDataStore) DeleteTaskById(id int) error {
+func (m *mockStore) DeleteTaskById(id int) error {
 	m.tasks = slices.DeleteFunc(m.tasks, func(task models.Task) bool {
 		return task.Id == id
 	})
