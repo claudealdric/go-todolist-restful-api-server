@@ -176,6 +176,25 @@ func TestHandlePostTasks(t *testing.T) {
 		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
 		testutils.AssertCalls(t, datastore.createTaskCalls, 0)
 	})
+
+	t.Run("responds with a 500 error when the store task creation fails", func(t *testing.T) {
+		datastore := newMockDataStore(true)
+		server := NewServer(datastore)
+
+		newTask := models.Task{2, "Exercise"}
+		jsonData, err := json.Marshal(newTask)
+		testutils.AssertNoError(t, err)
+		request := httptest.NewRequest(
+			http.MethodPost,
+			"/tasks",
+			bytes.NewBuffer(jsonData),
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		testutils.AssertStatus(t, response.Code, http.StatusInternalServerError)
+		testutils.AssertCalls(t, datastore.createTaskCalls, 1)
+	})
 }
 
 var initialTasks = []models.Task{{1, "Pack clothes"}}
@@ -194,6 +213,9 @@ func newMockDataStore(shouldError bool) *mockDataStore {
 
 func (m *mockDataStore) CreateTask(task models.Task) (models.Task, error) {
 	m.createTaskCalls++
+	if m.shouldError {
+		return models.Task{}, errors.New("forced error")
+	}
 	return task, nil
 }
 

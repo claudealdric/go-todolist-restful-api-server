@@ -57,7 +57,11 @@ func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	task, _ = s.store.CreateTask(task) // TODO: handle error
+	task, err = s.store.CreateTask(task)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(task); err != nil {
 		log.Printf("error encoding response: %v", err)
