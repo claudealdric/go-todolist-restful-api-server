@@ -40,7 +40,10 @@ func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
-	tasks, _ := s.store.GetTasks() // TODO: handle error
+	tasks, err := s.store.GetTasks()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	if err := json.NewEncoder(w).Encode(tasks); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
