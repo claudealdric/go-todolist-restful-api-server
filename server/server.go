@@ -42,11 +42,12 @@ func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	var task models.Task
-	if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
+	err := json.NewDecoder(r.Body).Decode(&task)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	task = s.store.CreateTask(task)
+	task, _ = s.store.CreateTask(task) // TODO: handle error
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(task); err != nil {
 		log.Printf("error encoding response: %v", err)

@@ -37,13 +37,17 @@ func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
 }
 
 func (f *FileSystemDataStore) GetTasks() []models.Task {
-	return f.getTasksFromFile()
+	tasks, _ := f.getTasksFromFile()
+	return tasks
 }
 
-func (f *FileSystemDataStore) CreateTask(task models.Task) models.Task {
+func (f *FileSystemDataStore) CreateTask(task models.Task) (models.Task, error) {
 	tasks := append(f.GetTasks(), task)
-	f.overwriteFile(tasks)
-	return task
+	err := f.overwriteFile(tasks)
+	if err != nil {
+
+	}
+	return task, nil
 }
 
 func (f *FileSystemDataStore) DeleteTaskById(id int) {
@@ -53,14 +57,21 @@ func (f *FileSystemDataStore) DeleteTaskById(id int) {
 	f.overwriteFile(tasks)
 }
 
-func (f *FileSystemDataStore) getTasksFromFile() []models.Task {
+func (f *FileSystemDataStore) getTasksFromFile() ([]models.Task, error) {
 	var tasks []models.Task
-	f.decoder.Decode(&tasks)
-	return tasks
+	err := f.decoder.Decode(&tasks)
+	if err != nil {
+		return nil, fmt.Errorf("error reading the file: %w", err)
+	}
+	return tasks, nil
 }
 
 func (f *FileSystemDataStore) overwriteFile(data any) error {
-	return f.encoder.Encode(data)
+	err := f.encoder.Encode(data)
+	if err != nil {
+		return fmt.Errorf("error writing to file: %w", err)
+	}
+	return nil
 }
 
 func initializeDBFile(file *os.File) error {

@@ -143,9 +143,9 @@ func newMockDataStore() *mockDataStore {
 	return m
 }
 
-func (m *mockDataStore) CreateTask(task models.Task) models.Task {
+func (m *mockDataStore) CreateTask(task models.Task) (models.Task, error) {
 	m.createTaskCalls++
-	return task
+	return task, nil
 }
 
 func (m *mockDataStore) GetTasks() []models.Task {
