@@ -34,6 +34,14 @@ func DoesNotContain[T comparable](t testing.TB, slice []T, element T) {
 	}
 }
 
+func HasError(t testing.TB, err error) {
+	t.Helper()
+	if err == nil {
+		t.Fatal("expected an error but didn't get one")
+	}
+
+}
+
 func NoError(t testing.TB, err error) {
 	t.Helper()
 	if err != nil {

@@ -54,6 +54,20 @@ func TestFileSystemStore(t *testing.T) {
 		assert.Equals(t, got, wantedTask)
 	})
 
+	t.Run("GetTaskById returns an error if it does not exist", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+
+		assert.NoError(t, err)
+
+		invalidId := -1
+		_, err = store.GetTaskById(invalidId)
+
+		assert.HasError(t, err)
+	})
+
 	t.Run("CreateTask stores and returns the created task", func(t *testing.T) {
 		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
 		defer cleanDatabase()
