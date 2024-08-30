@@ -1,7 +1,6 @@
 package data_test
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/data"
@@ -66,13 +65,7 @@ func TestFileSystemStore(t *testing.T) {
 		doesNotExistId := -1
 		_, err = store.GetTaskById(doesNotExistId)
 
-		if !errors.Is(err, data.ErrResourceNotFound) {
-			t.Errorf(
-				"wanted error of type '%v', got '%v'",
-				data.ErrResourceNotFound,
-				err,
-			)
-		}
+		assert.ErrorContains(t, err, data.ErrResourceNotFound)
 	})
 
 	t.Run("CreateTask stores and returns the created task", func(t *testing.T) {
