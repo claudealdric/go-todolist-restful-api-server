@@ -12,6 +12,7 @@ import (
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
+	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
 )
 
 func TestHandleRoot(t *testing.T) {
@@ -23,7 +24,7 @@ func TestHandleRoot(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		testutils.AssertStatus(t, response.Code, http.StatusOK)
+		assert.AssertStatus(t, response.Code, http.StatusOK)
 	})
 }
 
@@ -33,7 +34,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		server := NewServer(datastore)
 
 		tasks, err := datastore.GetTasks()
-		testutils.AssertNoError(t, err)
+		assert.AssertNoError(t, err)
 		initialTasksCount := len(tasks)
 		if initialTasksCount == 0 {
 			t.Error("expected at least one initial task")
@@ -48,10 +49,10 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		server.Handler.ServeHTTP(response, request)
-		testutils.AssertStatus(t, response.Code, http.StatusNoContent)
+		assert.AssertStatus(t, response.Code, http.StatusNoContent)
 
 		tasks, err = datastore.GetTasks()
-		testutils.AssertNoError(t, err)
+		assert.AssertNoError(t, err)
 		if len(tasks) != initialTasksCount-1 {
 			t.Errorf(
 				"expected a slice of length %d; received %+v",
@@ -73,7 +74,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		server.Handler.ServeHTTP(response, request)
-		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
+		assert.AssertStatus(t, response.Code, http.StatusBadRequest)
 	})
 
 	// TODO: implement after "get by ID" is implemented
@@ -90,7 +91,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 	// response := httptest.NewRecorder()
 	//
 	// server.Handler.ServeHTTP(response, request)
-	// testutils.AssertStatus(t, response.Code, http.StatusNotFound)
+	// assert.AssertStatus(t, response.Code, http.StatusNotFound)
 	// })
 }
 
@@ -103,14 +104,14 @@ func TestHandleGetTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		testutils.AssertContentType(
+		assert.AssertContentType(
 			t,
 			testutils.GetContentTypeFromResponse(response),
 			jsonContentType,
 		)
-		testutils.AssertStatus(t, response.Code, http.StatusOK)
-		testutils.AssertCalls(t, datastore.getTasksCalls, 1)
-		testutils.AssertEquals(
+		assert.AssertStatus(t, response.Code, http.StatusOK)
+		assert.AssertCalls(t, datastore.getTasksCalls, 1)
+		assert.AssertEquals(
 			t,
 			testutils.GetTasksFromResponse(t, response.Body),
 			initialTasks,
@@ -125,8 +126,8 @@ func TestHandleGetTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		testutils.AssertStatus(t, response.Code, http.StatusInternalServerError)
-		testutils.AssertCalls(t, datastore.getTasksCalls, 1)
+		assert.AssertStatus(t, response.Code, http.StatusInternalServerError)
+		assert.AssertCalls(t, datastore.getTasksCalls, 1)
 	})
 }
 
@@ -137,7 +138,7 @@ func TestHandlePostTasks(t *testing.T) {
 
 		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
-		testutils.AssertNoError(t, err)
+		assert.AssertNoError(t, err)
 		request := httptest.NewRequest(
 			http.MethodPost,
 			"/tasks",
@@ -146,14 +147,14 @@ func TestHandlePostTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		testutils.AssertContentType(
+		assert.AssertContentType(
 			t,
 			testutils.GetContentTypeFromResponse(response),
 			jsonContentType,
 		)
-		testutils.AssertStatus(t, response.Code, http.StatusCreated)
-		testutils.AssertCalls(t, datastore.createTaskCalls, 1)
-		testutils.AssertEquals(
+		assert.AssertStatus(t, response.Code, http.StatusCreated)
+		assert.AssertCalls(t, datastore.createTaskCalls, 1)
+		assert.AssertEquals(
 			t,
 			testutils.GetTaskFromResponse(t, response.Body),
 			newTask,
@@ -173,8 +174,8 @@ func TestHandlePostTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
-		testutils.AssertCalls(t, datastore.createTaskCalls, 0)
+		assert.AssertStatus(t, response.Code, http.StatusBadRequest)
+		assert.AssertCalls(t, datastore.createTaskCalls, 0)
 	})
 
 	t.Run("responds with a 500 error when the store task creation fails", func(t *testing.T) {
@@ -183,7 +184,7 @@ func TestHandlePostTasks(t *testing.T) {
 
 		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
-		testutils.AssertNoError(t, err)
+		assert.AssertNoError(t, err)
 		request := httptest.NewRequest(
 			http.MethodPost,
 			"/tasks",
@@ -192,8 +193,8 @@ func TestHandlePostTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		testutils.AssertStatus(t, response.Code, http.StatusInternalServerError)
-		testutils.AssertCalls(t, datastore.createTaskCalls, 1)
+		assert.AssertStatus(t, response.Code, http.StatusInternalServerError)
+		assert.AssertCalls(t, datastore.createTaskCalls, 1)
 	})
 }
 

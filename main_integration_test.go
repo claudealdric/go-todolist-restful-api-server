@@ -12,13 +12,14 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/server"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
+	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
 )
 
 func TestServer(t *testing.T) {
 	dbFile, cleanDatabase := testutils.CreateTempFile(t, `[]`)
 	defer cleanDatabase()
 	store, err := datastore.NewFileSystemDataStore(dbFile)
-	testutils.AssertNoError(t, err)
+	assert.AssertNoError(t, err)
 	server := server.NewServer(store)
 
 	initialTasks := []models.Task{
@@ -28,34 +29,34 @@ func TestServer(t *testing.T) {
 
 	for _, task := range initialTasks {
 		_, err := sendPostTask(server, task)
-		testutils.AssertNoError(t, err)
+		assert.AssertNoError(t, err)
 	}
 
 	t.Run("responds with a 200 OK status on GET `/`", func(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
-		testutils.AssertStatus(t, response.Code, http.StatusOK)
+		assert.AssertStatus(t, response.Code, http.StatusOK)
 	})
 
 	t.Run("responds with a 404 not found status on an invalid path", func(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/not-found", nil)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
-		testutils.AssertStatus(t, response.Code, http.StatusNotFound)
+		assert.AssertStatus(t, response.Code, http.StatusNotFound)
 	})
 
 	t.Run("returns a slice of tasks with GET `/tasks`", func(t *testing.T) {
 		response := sendGetTasks(server)
-		testutils.AssertStatus(t, response.Code, http.StatusOK)
+		assert.AssertStatus(t, response.Code, http.StatusOK)
 		tasks := testutils.GetTasksFromResponse(t, response.Body)
-		testutils.AssertEquals(t, tasks, initialTasks)
+		assert.AssertEquals(t, tasks, initialTasks)
 	})
 
 	t.Run("deletes the task with DELETE `/tasks/{id}`", func(t *testing.T) {
 		newTask := models.Task{3, "Cook food"}
 		postResponse, err := sendPostTask(server, newTask)
-		testutils.AssertNoError(t, err)
+		assert.AssertNoError(t, err)
 		newTask = testutils.GetTaskFromResponse(t, postResponse.Body)
 
 		deleteRequest := httptest.NewRequest(
@@ -65,11 +66,11 @@ func TestServer(t *testing.T) {
 		)
 		deleteResponse := httptest.NewRecorder()
 		server.ServeHTTP(deleteResponse, deleteRequest)
-		testutils.AssertStatus(t, deleteResponse.Code, http.StatusNoContent)
+		assert.AssertStatus(t, deleteResponse.Code, http.StatusNoContent)
 
 		getResponse := sendGetTasks(server)
 		tasks := testutils.GetTasksFromResponse(t, getResponse.Body)
-		testutils.AssertDoesNotContain(t, tasks, newTask)
+		assert.AssertDoesNotContain(t, tasks, newTask)
 	})
 }
 
