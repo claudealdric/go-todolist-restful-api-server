@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -25,8 +26,14 @@ func NewServer(store datastore.DataStore) *Server {
 }
 
 func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
-	// TODO: handle error
-	id, _ := strconv.Atoi(r.PathValue("id"))
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("ID: %q is invalid", r.PathValue("id")),
+			http.StatusBadRequest,
+		)
+	}
 	s.store.DeleteTaskById(id)
 	w.WriteHeader(http.StatusNoContent)
 }

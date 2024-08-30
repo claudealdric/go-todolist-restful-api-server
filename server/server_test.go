@@ -60,6 +60,21 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		}
 	})
 
+	t.Run("responds with a 400 Bad Request when sending a non-integer ID", func(t *testing.T) {
+		datastore := newMockDataStore()
+		server := NewServer(datastore)
+
+		request := httptest.NewRequest(
+			http.MethodDelete,
+			"/tasks/not-an-integer",
+			nil,
+		)
+		response := httptest.NewRecorder()
+
+		server.Handler.ServeHTTP(response, request)
+		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
+	})
+
 	// TODO: implement
 	// t.Run("responds with 404 Not Found when the task does not exist", func(t *testing.T) {
 	// datastore := newMockDataStore()
