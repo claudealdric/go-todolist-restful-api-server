@@ -1,7 +1,6 @@
 package datastore_test
 
 import (
-	"slices"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
@@ -13,6 +12,7 @@ import (
 func TestFileSystemDataStore(t *testing.T) {
 	initialTasks := []models.Task{{1, "Buy groceries"}}
 	jsonTasks, err := utils.ConvertToJSON(initialTasks)
+
 	testutils.AssertNoError(t, err)
 
 	t.Run("works with an empty file", func(t *testing.T) {
@@ -20,6 +20,7 @@ func TestFileSystemDataStore(t *testing.T) {
 		defer cleanDatabase()
 
 		_, err := datastore.NewFileSystemDataStore(database)
+
 		testutils.AssertNoError(t, err)
 	})
 
@@ -28,8 +29,11 @@ func TestFileSystemDataStore(t *testing.T) {
 		defer cleanDatabase()
 
 		store, err := datastore.NewFileSystemDataStore(database)
+
 		testutils.AssertNoError(t, err)
+
 		tasks, err := store.GetTasks()
+
 		testutils.AssertNoError(t, err)
 		testutils.AssertEquals(t, tasks, initialTasks)
 	})
@@ -39,14 +43,15 @@ func TestFileSystemDataStore(t *testing.T) {
 		defer cleanDatabase()
 
 		store, err := datastore.NewFileSystemDataStore(database)
+
 		testutils.AssertNoError(t, err)
+
 		newTask := models.Task{2, "Launder clothes"}
 		store.CreateTask(newTask)
 		tasks, err := store.GetTasks()
+
 		testutils.AssertNoError(t, err)
-		if !slices.Contains(tasks, newTask) {
-			t.Errorf("missing task '%v' from tasks '%v'", newTask, tasks)
-		}
+		testutils.AssertContains(t, tasks, newTask)
 	})
 
 	t.Run("DeleteTaskById deletes the selected task", func(t *testing.T) {
@@ -54,16 +59,15 @@ func TestFileSystemDataStore(t *testing.T) {
 		defer cleanDatabase()
 
 		store, err := datastore.NewFileSystemDataStore(database)
+
 		testutils.AssertNoError(t, err)
-		store.DeleteTaskById(initialTasks[0].Id)
+
+		taskToDelete := initialTasks[0]
+		store.DeleteTaskById(taskToDelete.Id)
 		tasks, err := store.GetTasks()
+
 		testutils.AssertNoError(t, err)
-		if slices.Contains(tasks, initialTasks[0]) {
-			t.Errorf(
-				"expected task '%+v' to be deleted but isn't",
-				initialTasks[0],
-			)
-		}
+		testutils.AssertDoesNotContain(t, tasks, taskToDelete)
 	})
 
 }

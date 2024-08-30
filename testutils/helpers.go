@@ -19,6 +19,13 @@ func AssertCalls(t testing.TB, got, want int) {
 	}
 }
 
+func AssertContains[T comparable](t testing.TB, slice []T, element T) {
+	t.Helper()
+	if !slices.Contains(slice, element) {
+		t.Errorf("slice should contain %v but doesn't", element)
+	}
+}
+
 func AssertContentType(t testing.TB, got, want string) {
 	t.Helper()
 	if got != want {
