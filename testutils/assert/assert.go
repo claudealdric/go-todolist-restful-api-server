@@ -47,7 +47,6 @@ func HasError(t testing.TB, err error) {
 	if err == nil {
 		t.Fatal("expected an error but didn't get one")
 	}
-
 }
 
 func HasNoError(t testing.TB, err error) {
@@ -55,7 +54,6 @@ func HasNoError(t testing.TB, err error) {
 	if err != nil {
 		t.Fatalf("didn't expect an error but got one, %v", err)
 	}
-
 }
 
 func Equals[T any](t testing.TB, got, want T) {
