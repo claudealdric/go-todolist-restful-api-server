@@ -29,7 +29,9 @@ func TestFileSystemDataStore(t *testing.T) {
 
 		store, err := datastore.NewFileSystemDataStore(database)
 		testutils.AssertNoError(t, err)
-		testutils.AssertEquals(t, store.GetTasks(), initialTasks)
+		tasks, err := store.GetTasks()
+		testutils.AssertNoError(t, err)
+		testutils.AssertEquals(t, tasks, initialTasks)
 	})
 
 	t.Run("CreateTask stores and returns the created task", func(t *testing.T) {
@@ -40,7 +42,8 @@ func TestFileSystemDataStore(t *testing.T) {
 		testutils.AssertNoError(t, err)
 		newTask := models.Task{Id: 2, Title: "Launder clothes"}
 		store.CreateTask(newTask)
-		tasks := store.GetTasks()
+		tasks, err := store.GetTasks()
+		testutils.AssertNoError(t, err)
 		if !slices.Contains(tasks, newTask) {
 			t.Errorf("missing task '%v' from tasks '%v'", newTask, tasks)
 		}
@@ -53,7 +56,8 @@ func TestFileSystemDataStore(t *testing.T) {
 		store, err := datastore.NewFileSystemDataStore(database)
 		testutils.AssertNoError(t, err)
 		store.DeleteTaskById(initialTasks[0].Id)
-		tasks := store.GetTasks()
+		tasks, err := store.GetTasks()
+		testutils.AssertNoError(t, err)
 		if slices.Contains(tasks, initialTasks[0]) {
 			t.Errorf(
 				"expected task '%+v' to be deleted but isn't",

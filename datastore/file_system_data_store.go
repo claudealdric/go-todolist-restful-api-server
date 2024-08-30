@@ -36,22 +36,33 @@ func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
 	}, nil
 }
 
-func (f *FileSystemDataStore) GetTasks() []models.Task {
-	tasks, _ := f.getTasksFromFile()
-	return tasks
+func (f *FileSystemDataStore) GetTasks() ([]models.Task, error) {
+	tasks, err := f.getTasksFromFile()
+	if err != nil {
+		return nil, err
+	}
+	return tasks, nil
 }
 
 func (f *FileSystemDataStore) CreateTask(task models.Task) (models.Task, error) {
-	tasks := append(f.GetTasks(), task)
-	err := f.overwriteFile(tasks)
+	tasks, err := f.GetTasks()
 	if err != nil {
-
+		return models.Task{}, err
+	}
+	tasks = append(tasks, task)
+	err = f.overwriteFile(tasks)
+	if err != nil {
+		return models.Task{}, err
 	}
 	return task, nil
 }
 
 func (f *FileSystemDataStore) DeleteTaskById(id int) error {
-	tasks := slices.DeleteFunc(f.GetTasks(), func(task models.Task) bool {
+	tasks, err := f.GetTasks()
+	if err != nil {
+		return err
+	}
+	tasks = slices.DeleteFunc(tasks, func(task models.Task) bool {
 		return task.Id == id
 	})
 	return f.overwriteFile(tasks)

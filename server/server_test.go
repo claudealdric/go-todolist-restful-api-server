@@ -31,7 +31,8 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
-		tasks := datastore.GetTasks()
+		tasks, err := datastore.GetTasks()
+		testutils.AssertNoError(t, err)
 		initialTasksCount := len(tasks)
 		if initialTasksCount == 0 {
 			t.Error("expected at least one initial task")
@@ -48,7 +49,9 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		server.Handler.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusNoContent)
 
-		if tasks := datastore.GetTasks(); len(tasks) != initialTasksCount-1 {
+		tasks, err = datastore.GetTasks()
+		testutils.AssertNoError(t, err)
+		if len(tasks) != initialTasksCount-1 {
 			t.Errorf(
 				"expected a slice of length %d; received %+v",
 				initialTasksCount-1,
@@ -148,9 +151,9 @@ func (m *mockDataStore) CreateTask(task models.Task) (models.Task, error) {
 	return task, nil
 }
 
-func (m *mockDataStore) GetTasks() []models.Task {
+func (m *mockDataStore) GetTasks() ([]models.Task, error) {
 	m.getTasksCalls++
-	return m.tasks
+	return m.tasks, nil
 }
 
 func (m *mockDataStore) DeleteTaskById(id int) error {
