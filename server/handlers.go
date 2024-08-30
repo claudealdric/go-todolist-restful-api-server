@@ -37,8 +37,15 @@ func (s *Server) HandleGetTaskById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	task, err := s.store.GetTaskById(id)
-	err = json.NewEncoder(w).Encode(task)
 	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("Task with ID: %d not found", id),
+			http.StatusNotFound,
+		)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(task); err != nil {
 		http.Error(
 			w,
 			fmt.Sprintf("ID: %q is invalid", r.PathValue("id")),

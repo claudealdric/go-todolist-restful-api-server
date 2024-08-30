@@ -140,6 +140,23 @@ func TestHandleGetTaskById(t *testing.T) {
 		assert.Status(t, response.Code, http.StatusBadRequest)
 		assert.Calls(t, data.getTaskByIdCalls, 0)
 	})
+
+	t.Run("responds with a 404 Not Found when the task cannot be found", func(t *testing.T) {
+		data := newMockStore(true)
+		server := NewServer(data)
+
+		doesNotExistId := -1
+		request := httptest.NewRequest(
+			http.MethodGet,
+			fmt.Sprintf("/tasks/%d", doesNotExistId),
+			nil,
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusNotFound)
+		assert.Calls(t, data.getTaskByIdCalls, 1)
+	})
 }
 
 func TestHandleGetTasks(t *testing.T) {
@@ -270,8 +287,12 @@ func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
 
 func (m *mockStore) GetTaskById(id int) (models.Task, error) {
 	m.getTaskByIdCalls++
+	var task models.Task
+	if m.shouldError {
+		return task, errors.New("forced error")
+	}
 	tasks, _ := m.GetTasks()
-	task, _ := utils.SliceFind(tasks, func(t models.Task) bool {
+	task, _ = utils.SliceFind(tasks, func(t models.Task) bool {
 		return t.Id == id
 	})
 	return task, nil
