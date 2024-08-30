@@ -36,6 +36,17 @@ func NewFileSystemStore(file *os.File) (*FileSystemStore, error) {
 	}, nil
 }
 
+func (f *FileSystemStore) GetTaskById(id int) (models.Task, error) {
+	var task models.Task
+	tasks, err := f.getTasksFromFile()
+	_ = err // TODO: handle error
+	i := slices.IndexFunc(tasks, func(task models.Task) bool {
+		return task.Id == id
+	})
+	task = tasks[i]
+	return task, nil
+}
+
 func (f *FileSystemStore) GetTasks() ([]models.Task, error) {
 	tasks, err := f.getTasksFromFile()
 	if err != nil {
