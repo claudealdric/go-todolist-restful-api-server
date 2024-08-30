@@ -76,7 +76,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		testutils.AssertStatus(t, response.Code, http.StatusBadRequest)
 	})
 
-	// TODO: implement
+	// TODO: implement after "get by ID" is implemented
 	// t.Run("responds with 404 Not Found when the task does not exist", func(t *testing.T) {
 	// datastore := newMockDataStore()
 	// server := NewServer(datastore)
