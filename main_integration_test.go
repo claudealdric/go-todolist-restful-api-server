@@ -53,6 +53,20 @@ func TestServer(t *testing.T) {
 		assert.Equals(t, tasks, initialTasks)
 	})
 
+	t.Run("returns the correct task with GET `/tasks/{id}`", func(t *testing.T) {
+		wantedTask := initialTasks[1]
+		request := httptest.NewRequest(
+			http.MethodGet,
+			fmt.Sprintf("/tasks/%d", wantedTask.Id),
+			nil,
+		)
+		response := httptest.NewRecorder()
+		server.ServeHTTP(response, request)
+		assert.Status(t, response.Code, http.StatusOK)
+		got := testutils.GetTaskFromResponse(t, response.Body)
+		assert.Equals(t, got, wantedTask)
+	})
+
 	t.Run("deletes the task with DELETE `/tasks/{id}`", func(t *testing.T) {
 		newTask := models.Task{3, "Cook food"}
 		postResponse, err := sendPostTask(server, newTask)
