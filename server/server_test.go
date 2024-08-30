@@ -18,11 +18,7 @@ func TestHandleRoot(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
-		request, err := http.NewRequest(http.MethodGet, "/", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
+		request := httptest.NewRequest(http.MethodGet, "/", nil)
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
@@ -67,11 +63,7 @@ func TestHandleGetTasks(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
-		request, err := http.NewRequest(http.MethodGet, "/tasks", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-
+		request := httptest.NewRequest(http.MethodGet, "/tasks", nil)
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
@@ -98,13 +90,11 @@ func TestHandlePostTasks(t *testing.T) {
 		newTask := models.Task{Title: "Exercise"}
 		jsonData, err := json.Marshal(newTask)
 		testutils.AssertNoError(t, err)
-		request, err := http.NewRequest(
+		request := httptest.NewRequest(
 			http.MethodPost,
 			"/tasks",
 			bytes.NewBuffer(jsonData),
 		)
-		testutils.AssertNoError(t, err)
-
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
@@ -127,13 +117,11 @@ func TestHandlePostTasks(t *testing.T) {
 		server := NewServer(datastore)
 
 		invalidJson := `{`
-		request, err := http.NewRequest(
+		request := httptest.NewRequest(
 			http.MethodPost,
 			"/tasks",
 			bytes.NewBuffer([]byte(invalidJson)),
 		)
-		testutils.AssertNoError(t, err)
-
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
