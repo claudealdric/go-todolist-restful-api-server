@@ -90,7 +90,7 @@ func TestHandlePostTasks(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
-		newTask := models.Task{Title: "Exercise"}
+		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
 		testutils.AssertNoError(t, err)
 		request := httptest.NewRequest(
@@ -133,7 +133,7 @@ func TestHandlePostTasks(t *testing.T) {
 	})
 }
 
-var initialTasks = []models.Task{{Id: 1, Title: "Pack clothes"}}
+var initialTasks = []models.Task{{1, "Pack clothes"}}
 
 type mockDataStore struct {
 	createTaskCalls int

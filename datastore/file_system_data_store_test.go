@@ -11,7 +11,7 @@ import (
 )
 
 func TestFileSystemDataStore(t *testing.T) {
-	initialTasks := []models.Task{{Id: 1, Title: "Buy groceries"}}
+	initialTasks := []models.Task{{1, "Buy groceries"}}
 	jsonTasks, err := utils.ConvertToJSON(initialTasks)
 	testutils.AssertNoError(t, err)
 
@@ -40,7 +40,7 @@ func TestFileSystemDataStore(t *testing.T) {
 
 		store, err := datastore.NewFileSystemDataStore(database)
 		testutils.AssertNoError(t, err)
-		newTask := models.Task{Id: 2, Title: "Launder clothes"}
+		newTask := models.Task{2, "Launder clothes"}
 		store.CreateTask(newTask)
 		tasks, err := store.GetTasks()
 		testutils.AssertNoError(t, err)
