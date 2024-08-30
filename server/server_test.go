@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 )
 
+// TODO: remove the extraneous handler; use `server.Handler.ServeHTTP` instead
 func TestHandleRoot(t *testing.T) {
 	t.Run("responds with 200 OK status", func(t *testing.T) {
 		datastore := newMockDataStore()
@@ -31,23 +33,34 @@ func TestHandleRoot(t *testing.T) {
 }
 
 func TestHandleDeleteTaskById(t *testing.T) {
-	t.Run("responds with 204 No Content", func(t *testing.T) {
+	t.Run("deletes the task and responds with 204 No Content", func(t *testing.T) {
 		datastore := newMockDataStore()
 		server := NewServer(datastore)
 
-		request, err := http.NewRequest(
-			http.MethodPost,
-			fmt.Sprintf("/tasks/%d", initialTasks[0].Id),
+		tasks := datastore.GetTasks()
+		initialTasksCount := len(tasks)
+		if initialTasksCount == 0 {
+			t.Error("expected at least one initial task")
+		}
+
+		taskToDelete := tasks[0]
+		request := httptest.NewRequest(
+			http.MethodDelete,
+			fmt.Sprintf("/tasks/%d", taskToDelete.Id),
 			nil,
 		)
-		testutils.AssertNoError(t, err)
-
 		response := httptest.NewRecorder()
-		handler := http.HandlerFunc(server.HandleDeleteTaskById)
-		handler.ServeHTTP(response, request)
 
+		server.Handler.ServeHTTP(response, request)
 		testutils.AssertStatus(t, response.Code, http.StatusNoContent)
-		// testutils.AssertCalls(t, datastore.createTaskCalls, 1)
+
+		if tasks := datastore.GetTasks(); len(tasks) != initialTasksCount-1 {
+			t.Errorf(
+				"expected a slice of length %d; received %+v",
+				initialTasksCount-1,
+				tasks,
+			)
+		}
 	})
 }
 
@@ -134,7 +147,7 @@ func TestHandlePostTasks(t *testing.T) {
 	})
 }
 
-var initialTasks = []models.Task{{Title: "Pack clothes"}}
+var initialTasks = []models.Task{{Id: 1, Title: "Pack clothes"}}
 
 type mockDataStore struct {
 	createTaskCalls int
@@ -155,4 +168,10 @@ func (m *mockDataStore) CreateTask(task models.Task) models.Task {
 func (m *mockDataStore) GetTasks() []models.Task {
 	m.getTasksCalls++
 	return m.tasks
+}
+
+func (m *mockDataStore) DeleteTaskById(id int) {
+	m.tasks = slices.DeleteFunc(m.tasks, func(task models.Task) bool {
+		return task.Id == id
+	})
 }

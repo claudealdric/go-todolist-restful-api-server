@@ -10,6 +10,7 @@ func NewRouter(s *Server) *http.ServeMux {
 	mux.HandleFunc(get("/{$}"), s.HandleRoot)
 	mux.HandleFunc(get("/tasks"), s.HandleGetTasks)
 	mux.HandleFunc("POST /tasks", s.HandlePostTasks)
+	mux.HandleFunc("DELETE /tasks/{id}", s.HandleDeleteTaskById)
 	return mux
 }
 

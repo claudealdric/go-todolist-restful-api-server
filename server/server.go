@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/datastore"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
@@ -24,6 +25,9 @@ func NewServer(store datastore.DataStore) *Server {
 }
 
 func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
+	// TODO: handle error
+	id, _ := strconv.Atoi(r.PathValue("id"))
+	s.store.DeleteTaskById(id)
 	w.WriteHeader(http.StatusNoContent)
 }
 
