@@ -36,7 +36,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		server := NewServer(data)
 
 		tasks, err := data.GetTasks()
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		initialTasksCount := len(tasks)
 		if initialTasksCount == 0 {
 			t.Error("expected at least one initial task")
@@ -54,7 +54,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		assert.Status(t, response.Code, http.StatusNoContent)
 
 		tasks, err = data.GetTasks()
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		if len(tasks) != initialTasksCount-1 {
 			t.Errorf(
 				"expected a slice of length %d; received %+v",
@@ -219,7 +219,7 @@ func TestHandlePostTasks(t *testing.T) {
 
 		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		request := httptest.NewRequest(
 			http.MethodPost,
 			"/tasks",
@@ -265,7 +265,7 @@ func TestHandlePostTasks(t *testing.T) {
 
 		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		request := httptest.NewRequest(
 			http.MethodPost,
 			"/tasks",

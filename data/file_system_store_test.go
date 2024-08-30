@@ -14,7 +14,7 @@ func TestFileSystemStore(t *testing.T) {
 	initialTasks := []models.Task{{1, "Buy groceries"}}
 	jsonTasks, err := utils.ConvertToJSON(initialTasks)
 
-	assert.NoError(t, err)
+	assert.HasNoError(t, err)
 
 	t.Run("works with an empty file", func(t *testing.T) {
 		database, cleanDatabase := testutils.CreateTempFile(t, "")
@@ -22,7 +22,7 @@ func TestFileSystemStore(t *testing.T) {
 
 		_, err := data.NewFileSystemStore(database)
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 	})
 
 	t.Run("GetTasks returns the stored tasks", func(t *testing.T) {
@@ -31,11 +31,11 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := data.NewFileSystemStore(database)
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 
 		tasks, err := store.GetTasks()
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		assert.Equals(t, tasks, initialTasks)
 	})
 
@@ -45,12 +45,12 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := data.NewFileSystemStore(database)
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 
 		wantedTask := initialTasks[0]
 		got, err := store.GetTaskById(wantedTask.Id)
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		assert.Equals(t, got, wantedTask)
 	})
 
@@ -60,7 +60,7 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := data.NewFileSystemStore(database)
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 
 		doesNotExistId := -1
 		_, err = store.GetTaskById(doesNotExistId)
@@ -74,13 +74,13 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := data.NewFileSystemStore(database)
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 
 		newTask := models.Task{2, "Launder clothes"}
 		store.CreateTask(newTask)
 		tasks, err := store.GetTasks()
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		assert.Contains(t, tasks, newTask)
 	})
 
@@ -90,13 +90,13 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := data.NewFileSystemStore(database)
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 
 		taskToDelete := initialTasks[0]
 		store.DeleteTaskById(taskToDelete.Id)
 		tasks, err := store.GetTasks()
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		assert.DoesNotContain(t, tasks, taskToDelete)
 	})
 
@@ -106,7 +106,7 @@ func TestFileSystemStore(t *testing.T) {
 
 		store, err := data.NewFileSystemStore(database)
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 
 		doesNotExistId := -1
 		err = store.DeleteTaskById(doesNotExistId)

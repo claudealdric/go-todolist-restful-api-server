@@ -15,7 +15,7 @@ func TestConvertToJSON(t *testing.T) {
 		json, err := ConvertToJSON(n)
 		want := `{"id":1}`
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		assert.Equals(t, string(json), want)
 	})
 
@@ -27,7 +27,7 @@ func TestConvertToJSON(t *testing.T) {
 		json, err := ConvertToJSON(s)
 		want := `[{"id":1},{"id":2}]`
 
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		assert.Equals(t, string(json), want)
 	})
 

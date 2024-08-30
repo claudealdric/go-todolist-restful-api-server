@@ -19,7 +19,7 @@ func TestServer(t *testing.T) {
 	dbFile, cleanDatabase := testutils.CreateTempFile(t, `[]`)
 	defer cleanDatabase()
 	store, err := data.NewFileSystemStore(dbFile)
-	assert.NoError(t, err)
+	assert.HasNoError(t, err)
 	server := api.NewServer(store)
 
 	initialTasks := []models.Task{
@@ -29,7 +29,7 @@ func TestServer(t *testing.T) {
 
 	for _, task := range initialTasks {
 		_, err := sendPostTask(server, task)
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 	}
 
 	t.Run("responds with a 200 OK status on GET `/`", func(t *testing.T) {
@@ -70,7 +70,7 @@ func TestServer(t *testing.T) {
 	t.Run("deletes the task with DELETE `/tasks/{id}`", func(t *testing.T) {
 		newTask := models.Task{3, "Cook food"}
 		postResponse, err := sendPostTask(server, newTask)
-		assert.NoError(t, err)
+		assert.HasNoError(t, err)
 		newTask = testutils.GetTaskFromResponse(t, postResponse.Body)
 
 		deleteRequest := httptest.NewRequest(

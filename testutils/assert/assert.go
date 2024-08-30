@@ -50,7 +50,7 @@ func HasError(t testing.TB, err error) {
 
 }
 
-func NoError(t testing.TB, err error) {
+func HasNoError(t testing.TB, err error) {
 	t.Helper()
 	if err != nil {
 		t.Fatalf("didn't expect an error but got one, %v", err)
