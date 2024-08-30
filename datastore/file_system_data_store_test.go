@@ -11,11 +11,9 @@ import (
 )
 
 func TestFileSystemDataStore(t *testing.T) {
-	initialTasks := []models.Task{{Title: "Buy groceries"}}
+	initialTasks := []models.Task{{Id: 1, Title: "Buy groceries"}}
 	jsonTasks, err := utils.ConvertToJSON(initialTasks)
 	testutils.AssertNoError(t, err)
-	database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
-	defer cleanDatabase()
 
 	t.Run("works with an empty file", func(t *testing.T) {
 		database, cleanDatabase := testutils.CreateTempFile(t, "")
@@ -26,15 +24,21 @@ func TestFileSystemDataStore(t *testing.T) {
 	})
 
 	t.Run("GetTasks returns the stored tasks", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
+		defer cleanDatabase()
+
 		store, err := datastore.NewFileSystemDataStore(database)
 		testutils.AssertNoError(t, err)
 		testutils.AssertEquals(t, store.GetTasks(), initialTasks)
 	})
 
 	t.Run("CreateTask stores and returns the created task", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
+		defer cleanDatabase()
+
 		store, err := datastore.NewFileSystemDataStore(database)
 		testutils.AssertNoError(t, err)
-		newTask := models.Task{Title: "Launder clothes"}
+		newTask := models.Task{Id: 2, Title: "Launder clothes"}
 		store.CreateTask(newTask)
 		tasks := store.GetTasks()
 		if !slices.Contains(tasks, newTask) {
@@ -43,6 +47,9 @@ func TestFileSystemDataStore(t *testing.T) {
 	})
 
 	t.Run("DeleteTaskById deletes the selected task", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
+		defer cleanDatabase()
+
 		store, err := datastore.NewFileSystemDataStore(database)
 		testutils.AssertNoError(t, err)
 		store.DeleteTaskById(initialTasks[0].Id)

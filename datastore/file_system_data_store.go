@@ -11,8 +11,8 @@ import (
 )
 
 type FileSystemDataStore struct {
-	database *json.Encoder
-	tasks    []models.Task
+	encoder *json.Encoder
+	decoder *json.Decoder
 }
 
 func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
@@ -21,8 +21,6 @@ func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
 	if err != nil {
 		return nil, fmt.Errorf("problem initializing player db file, %v", err)
 	}
-
-	tasks, err := newTasks(file)
 
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -34,24 +32,35 @@ func NewFileSystemDataStore(file *os.File) (*FileSystemDataStore, error) {
 
 	return &FileSystemDataStore{
 		json.NewEncoder(&tape{file}),
-		tasks,
+		json.NewDecoder(&tape{file}),
 	}, nil
 }
 
 func (f *FileSystemDataStore) GetTasks() []models.Task {
-	return f.tasks
+	return f.getTasksFromFile()
 }
 
 func (f *FileSystemDataStore) CreateTask(task models.Task) models.Task {
-	f.tasks = append(f.tasks, task)
-	f.database.Encode(f.tasks)
+	tasks := append(f.GetTasks(), task)
+	f.overwriteFile(tasks)
 	return task
 }
 
 func (f *FileSystemDataStore) DeleteTaskById(id int) {
-	f.tasks = slices.DeleteFunc(f.tasks, func(task models.Task) bool {
+	tasks := slices.DeleteFunc(f.GetTasks(), func(task models.Task) bool {
 		return task.Id == id
 	})
+	f.overwriteFile(tasks)
+}
+
+func (f *FileSystemDataStore) getTasksFromFile() []models.Task {
+	var tasks []models.Task
+	f.decoder.Decode(&tasks)
+	return tasks
+}
+
+func (f *FileSystemDataStore) overwriteFile(data any) error {
+	return f.encoder.Encode(data)
 }
 
 func initializeDBFile(file *os.File) error {
@@ -98,13 +107,4 @@ func initializeDBFile(file *os.File) error {
 	}
 
 	return nil
-}
-
-func newTasks(r io.Reader) ([]models.Task, error) {
-	var tasks []models.Task
-	err := json.NewDecoder(r).Decode(&tasks)
-	if err != nil {
-		err = fmt.Errorf("problem parsing tasks, %v", err)
-	}
-	return tasks, err
 }
