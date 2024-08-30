@@ -19,7 +19,7 @@ func TestServer(t *testing.T) {
 	dbFile, cleanDatabase := testutils.CreateTempFile(t, `[]`)
 	defer cleanDatabase()
 	store, err := datastore.NewFileSystemDataStore(dbFile)
-	assert.AssertNoError(t, err)
+	assert.NoError(t, err)
 	server := server.NewServer(store)
 
 	initialTasks := []models.Task{
@@ -29,34 +29,34 @@ func TestServer(t *testing.T) {
 
 	for _, task := range initialTasks {
 		_, err := sendPostTask(server, task)
-		assert.AssertNoError(t, err)
+		assert.NoError(t, err)
 	}
 
 	t.Run("responds with a 200 OK status on GET `/`", func(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
-		assert.AssertStatus(t, response.Code, http.StatusOK)
+		assert.Status(t, response.Code, http.StatusOK)
 	})
 
 	t.Run("responds with a 404 not found status on an invalid path", func(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/not-found", nil)
 		response := httptest.NewRecorder()
 		server.ServeHTTP(response, request)
-		assert.AssertStatus(t, response.Code, http.StatusNotFound)
+		assert.Status(t, response.Code, http.StatusNotFound)
 	})
 
 	t.Run("returns a slice of tasks with GET `/tasks`", func(t *testing.T) {
 		response := sendGetTasks(server)
-		assert.AssertStatus(t, response.Code, http.StatusOK)
+		assert.Status(t, response.Code, http.StatusOK)
 		tasks := testutils.GetTasksFromResponse(t, response.Body)
-		assert.AssertEquals(t, tasks, initialTasks)
+		assert.Equals(t, tasks, initialTasks)
 	})
 
 	t.Run("deletes the task with DELETE `/tasks/{id}`", func(t *testing.T) {
 		newTask := models.Task{3, "Cook food"}
 		postResponse, err := sendPostTask(server, newTask)
-		assert.AssertNoError(t, err)
+		assert.NoError(t, err)
 		newTask = testutils.GetTaskFromResponse(t, postResponse.Body)
 
 		deleteRequest := httptest.NewRequest(
@@ -66,11 +66,11 @@ func TestServer(t *testing.T) {
 		)
 		deleteResponse := httptest.NewRecorder()
 		server.ServeHTTP(deleteResponse, deleteRequest)
-		assert.AssertStatus(t, deleteResponse.Code, http.StatusNoContent)
+		assert.Status(t, deleteResponse.Code, http.StatusNoContent)
 
 		getResponse := sendGetTasks(server)
 		tasks := testutils.GetTasksFromResponse(t, getResponse.Body)
-		assert.AssertDoesNotContain(t, tasks, newTask)
+		assert.DoesNotContain(t, tasks, newTask)
 	})
 }
 

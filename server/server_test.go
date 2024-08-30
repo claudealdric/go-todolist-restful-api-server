@@ -24,7 +24,7 @@ func TestHandleRoot(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		assert.AssertStatus(t, response.Code, http.StatusOK)
+		assert.Status(t, response.Code, http.StatusOK)
 	})
 }
 
@@ -34,7 +34,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		server := NewServer(datastore)
 
 		tasks, err := datastore.GetTasks()
-		assert.AssertNoError(t, err)
+		assert.NoError(t, err)
 		initialTasksCount := len(tasks)
 		if initialTasksCount == 0 {
 			t.Error("expected at least one initial task")
@@ -49,10 +49,10 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		server.Handler.ServeHTTP(response, request)
-		assert.AssertStatus(t, response.Code, http.StatusNoContent)
+		assert.Status(t, response.Code, http.StatusNoContent)
 
 		tasks, err = datastore.GetTasks()
-		assert.AssertNoError(t, err)
+		assert.NoError(t, err)
 		if len(tasks) != initialTasksCount-1 {
 			t.Errorf(
 				"expected a slice of length %d; received %+v",
@@ -74,7 +74,7 @@ func TestHandleDeleteTaskById(t *testing.T) {
 		response := httptest.NewRecorder()
 
 		server.Handler.ServeHTTP(response, request)
-		assert.AssertStatus(t, response.Code, http.StatusBadRequest)
+		assert.Status(t, response.Code, http.StatusBadRequest)
 	})
 
 	// TODO: implement after "get by ID" is implemented
@@ -104,14 +104,14 @@ func TestHandleGetTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		assert.AssertContentType(
+		assert.ContentType(
 			t,
 			testutils.GetContentTypeFromResponse(response),
 			jsonContentType,
 		)
-		assert.AssertStatus(t, response.Code, http.StatusOK)
-		assert.AssertCalls(t, datastore.getTasksCalls, 1)
-		assert.AssertEquals(
+		assert.Status(t, response.Code, http.StatusOK)
+		assert.Calls(t, datastore.getTasksCalls, 1)
+		assert.Equals(
 			t,
 			testutils.GetTasksFromResponse(t, response.Body),
 			initialTasks,
@@ -126,8 +126,8 @@ func TestHandleGetTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		assert.AssertStatus(t, response.Code, http.StatusInternalServerError)
-		assert.AssertCalls(t, datastore.getTasksCalls, 1)
+		assert.Status(t, response.Code, http.StatusInternalServerError)
+		assert.Calls(t, datastore.getTasksCalls, 1)
 	})
 }
 
@@ -138,7 +138,7 @@ func TestHandlePostTasks(t *testing.T) {
 
 		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
-		assert.AssertNoError(t, err)
+		assert.NoError(t, err)
 		request := httptest.NewRequest(
 			http.MethodPost,
 			"/tasks",
@@ -147,14 +147,14 @@ func TestHandlePostTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		assert.AssertContentType(
+		assert.ContentType(
 			t,
 			testutils.GetContentTypeFromResponse(response),
 			jsonContentType,
 		)
-		assert.AssertStatus(t, response.Code, http.StatusCreated)
-		assert.AssertCalls(t, datastore.createTaskCalls, 1)
-		assert.AssertEquals(
+		assert.Status(t, response.Code, http.StatusCreated)
+		assert.Calls(t, datastore.createTaskCalls, 1)
+		assert.Equals(
 			t,
 			testutils.GetTaskFromResponse(t, response.Body),
 			newTask,
@@ -174,8 +174,8 @@ func TestHandlePostTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		assert.AssertStatus(t, response.Code, http.StatusBadRequest)
-		assert.AssertCalls(t, datastore.createTaskCalls, 0)
+		assert.Status(t, response.Code, http.StatusBadRequest)
+		assert.Calls(t, datastore.createTaskCalls, 0)
 	})
 
 	t.Run("responds with a 500 error when the store task creation fails", func(t *testing.T) {
@@ -184,7 +184,7 @@ func TestHandlePostTasks(t *testing.T) {
 
 		newTask := models.Task{2, "Exercise"}
 		jsonData, err := json.Marshal(newTask)
-		assert.AssertNoError(t, err)
+		assert.NoError(t, err)
 		request := httptest.NewRequest(
 			http.MethodPost,
 			"/tasks",
@@ -193,8 +193,8 @@ func TestHandlePostTasks(t *testing.T) {
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
 
-		assert.AssertStatus(t, response.Code, http.StatusInternalServerError)
-		assert.AssertCalls(t, datastore.createTaskCalls, 1)
+		assert.Status(t, response.Code, http.StatusInternalServerError)
+		assert.Calls(t, datastore.createTaskCalls, 1)
 	})
 }
 
