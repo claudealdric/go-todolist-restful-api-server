@@ -24,11 +24,11 @@ func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 	if err := s.store.DeleteTaskById(id); err != nil {
-		http.Error(
-			w,
-			err.Error(),
-			http.StatusNotFound,
-		)
+		if errors.Is(err, data.ErrResourceNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 	w.WriteHeader(http.StatusNoContent)
 }

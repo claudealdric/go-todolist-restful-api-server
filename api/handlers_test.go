@@ -94,6 +94,22 @@ func TestHandleDeleteTaskById(t *testing.T) {
 
 		assert.Status(t, response.Code, http.StatusNotFound)
 	})
+
+	t.Run("responds with 500 error when the store task deletion fails for an unknown reason", func(t *testing.T) {
+		data := newMockStore(true)
+		server := NewServer(data)
+
+		taskToDelete := initialTasks[0]
+		request := httptest.NewRequest(
+			http.MethodDelete,
+			fmt.Sprintf("/tasks/%d", taskToDelete.Id),
+			nil,
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusInternalServerError)
+	})
 }
 
 func TestHandleGetTaskById(t *testing.T) {
@@ -328,6 +344,9 @@ func (m *mockStore) GetTasks() ([]models.Task, error) {
 }
 
 func (m *mockStore) DeleteTaskById(id int) error {
+	if m.shouldError {
+		return errors.New("forced error")
+	}
 	i := slices.IndexFunc(m.tasks, func(task models.Task) bool {
 		return task.Id == id
 	})
