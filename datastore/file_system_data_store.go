@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 )
@@ -45,6 +46,12 @@ func (f *FileSystemDataStore) CreateTask(task models.Task) models.Task {
 	f.tasks = append(f.tasks, task)
 	f.database.Encode(f.tasks)
 	return task
+}
+
+func (f *FileSystemDataStore) DeleteTaskById(id int) {
+	f.tasks = slices.DeleteFunc(f.tasks, func(task models.Task) bool {
+		return task.Id == id
+	})
 }
 
 func initializeDBFile(file *os.File) error {

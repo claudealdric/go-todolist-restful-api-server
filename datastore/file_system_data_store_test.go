@@ -42,4 +42,17 @@ func TestFileSystemDataStore(t *testing.T) {
 		}
 	})
 
+	t.Run("DeleteTaskById deletes the selected task", func(t *testing.T) {
+		store, err := datastore.NewFileSystemDataStore(database)
+		testutils.AssertNoError(t, err)
+		store.DeleteTaskById(initialTasks[0].Id)
+		tasks := store.GetTasks()
+		if slices.Contains(tasks, initialTasks[0]) {
+			t.Errorf(
+				"expected task '%+v' to be deleted but isn't",
+				initialTasks[0],
+			)
+		}
+	})
+
 }
