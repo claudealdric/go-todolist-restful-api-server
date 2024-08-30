@@ -71,7 +71,6 @@ func TestServer(t *testing.T) {
 		tasks := testutils.GetTasksFromResponse(t, getResponse.Body)
 		testutils.AssertDoesNotContain(t, tasks, newTask)
 	})
-	// TODO: return a 404 Not Found if the resource cannot be found
 }
 
 func sendGetTasks(server *server.Server) *httptest.ResponseRecorder {
