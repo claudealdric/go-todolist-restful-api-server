@@ -107,4 +107,18 @@ func TestFileSystemStore(t *testing.T) {
 		assert.DoesNotContain(t, tasks, taskToDelete)
 	})
 
+	t.Run("DeleteTaskById returns with a `ErrResourceNotFound` error if task does not exist", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+
+		assert.NoError(t, err)
+
+		doesNotExistId := -1
+		err = store.DeleteTaskById(doesNotExistId)
+
+		assert.ErrorContains(t, err, data.ErrResourceNotFound)
+	})
+
 }

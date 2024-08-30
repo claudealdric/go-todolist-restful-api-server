@@ -1,6 +1,7 @@
 package assert
 
 import (
+	"errors"
 	"reflect"
 	"slices"
 	"testing"
@@ -31,6 +32,13 @@ func DoesNotContain[T comparable](t testing.TB, slice []T, element T) {
 	t.Helper()
 	if slices.Contains(slice, element) {
 		t.Errorf("slice should not contain %v but does", element)
+	}
+}
+
+func ErrorContains(t testing.TB, got, want error) {
+	t.Helper()
+	if !errors.Is(got, want) {
+		t.Errorf("wanted error of type '%v', got '%v'", want, got)
 	}
 }
 

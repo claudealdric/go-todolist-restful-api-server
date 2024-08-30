@@ -82,6 +82,12 @@ func (f *FileSystemStore) DeleteTaskById(id int) error {
 	if err != nil {
 		return err
 	}
+	i := slices.IndexFunc(tasks, func(task models.Task) bool {
+		return task.Id == id
+	})
+	if i == -1 {
+		return fmt.Errorf("error with task ID %d: %w", id, ErrResourceNotFound)
+	}
 	tasks = slices.DeleteFunc(tasks, func(task models.Task) bool {
 		return task.Id == id
 	})
