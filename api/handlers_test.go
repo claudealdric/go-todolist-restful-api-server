@@ -390,6 +390,29 @@ func TestHandlePatchTasks(t *testing.T) {
 		assert.Status(t, response.Code, http.StatusBadRequest)
 		assert.Calls(t, data.updateTaskCalls, 0)
 	})
+
+	t.Run("responds with a 500 error when an unknown store error occurs", func(t *testing.T) {
+		data := newMockStore(true)
+		server := NewServer(data)
+
+		task := initialTasks[0]
+
+		newTitle := "Pack bags"
+		dto := models.UpdateTaskDTO{Title: &newTitle}
+		jsonData, err := json.Marshal(dto)
+		assert.HasNoError(t, err)
+
+		request := httptest.NewRequest(
+			http.MethodPatch,
+			fmt.Sprintf("/tasks/%d", task.Id),
+			bytes.NewBuffer(jsonData),
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusInternalServerError)
+		assert.Calls(t, data.updateTaskCalls, 1)
+	})
 }
 
 var initialTasks = []models.Task{{1, "Pack clothes"}}
@@ -459,6 +482,9 @@ func (m *mockStore) DeleteTaskById(id int) error {
 
 func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 	m.updateTaskCalls++
+	if m.shouldError {
+		return models.Task{}, errors.New("forced error")
+	}
 	for i, t := range m.tasks {
 		if t.Id == task.Id {
 			m.tasks[i] = task

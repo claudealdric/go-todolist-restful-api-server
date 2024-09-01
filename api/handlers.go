@@ -101,8 +101,12 @@ func (s *Server) HandlePatchTaskById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatedTask, err := s.store.UpdateTask(task)
-	if err != nil && errors.Is(err, data.ErrResourceNotFound) {
+	if errors.Is(err, data.ErrResourceNotFound) {
 		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
