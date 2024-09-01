@@ -86,6 +86,39 @@ func TestServer(t *testing.T) {
 		tasks := testutils.GetTasksFromResponse(t, getResponse.Body)
 		assert.DoesNotContain(t, tasks, newTask)
 	})
+
+	t.Run("updates the task with PATCH `/tasks/{id}`", func(t *testing.T) {
+		taskId := 4
+		task := models.Task{taskId, "Walk the dog"}
+		_, err := sendPostTask(server, task)
+		assert.HasNoError(t, err)
+
+		newTitle := "Walk the cat"
+		updateTaskDTO := models.UpdateTaskDTO{Title: &newTitle}
+		patchResponse, err := sendPatchTask(server, updateTaskDTO, taskId)
+		assert.HasNoError(t, err)
+
+		wantedTask := models.Task{taskId, *updateTaskDTO.Title}
+
+		updatedTask := testutils.GetTaskFromResponse(t, patchResponse.Body)
+		assert.Status(t, patchResponse.Code, http.StatusOK)
+		assert.Equals(t, updatedTask, wantedTask)
+
+		getResponse := sendGetTaskById(server, taskId)
+		task = testutils.GetTaskFromResponse(t, getResponse.Body)
+		assert.Equals(t, task, wantedTask)
+	})
+}
+
+func sendGetTaskById(server *api.Server, id int) *httptest.ResponseRecorder {
+	request := httptest.NewRequest(
+		http.MethodGet,
+		fmt.Sprintf("/tasks/%d", id),
+		nil,
+	)
+	response := httptest.NewRecorder()
+	server.ServeHTTP(response, request)
+	return response
 }
 
 func sendGetTasks(server *api.Server) *httptest.ResponseRecorder {
@@ -93,6 +126,28 @@ func sendGetTasks(server *api.Server) *httptest.ResponseRecorder {
 	response := httptest.NewRecorder()
 	server.ServeHTTP(response, request)
 	return response
+}
+
+func sendPatchTask(
+	server *api.Server,
+	DTO models.UpdateTaskDTO,
+	taskId int,
+) (
+	*httptest.ResponseRecorder,
+	error,
+) {
+	jsonBody, err := json.Marshal(DTO)
+	if err != nil {
+		return nil, err
+	}
+	request := httptest.NewRequest(
+		http.MethodPatch,
+		fmt.Sprintf("/tasks/%d", taskId),
+		bytes.NewBuffer(jsonBody),
+	)
+	response := httptest.NewRecorder()
+	server.ServeHTTP(response, request)
+	return response, nil
 }
 
 func sendPostTask(server *api.Server, task models.Task) (*httptest.ResponseRecorder, error) {
