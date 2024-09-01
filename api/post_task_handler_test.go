@@ -12,7 +12,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
 )
 
-func TestHandlePostTasks(t *testing.T) {
+func TestHandlePostTask(t *testing.T) {
 	t.Run("creates and returns the task with a 201 Status Created", func(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)

@@ -8,7 +8,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 )
 
-func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandlePostTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	var task models.Task
 	err := json.NewDecoder(r.Body).Decode(&task)
