@@ -123,8 +123,12 @@ func TestFileSystemStore(t *testing.T) {
 
 		task := initialTasks[0]
 		newTitle := "Buy food"
-		dto := models.UpdateTaskDTO{Title: &newTitle}
-		updatedTask := store.UpdateTaskById(task.Id, dto)
+		updatedTask := store.UpdateTask(
+			models.Task{
+				Id:    task.Id,
+				Title: newTitle,
+			},
+		)
 		wantedTask := models.Task{Id: task.Id, Title: newTitle}
 		assert.Equals(t, updatedTask, wantedTask)
 
