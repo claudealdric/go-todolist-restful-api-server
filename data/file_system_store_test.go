@@ -114,4 +114,22 @@ func TestFileSystemStore(t *testing.T) {
 		assert.ErrorContains(t, err, data.ErrResourceNotFound)
 	})
 
+	t.Run("UpdateTaskById updates and returns the task if it exists", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+		assert.HasNoError(t, err)
+
+		task := initialTasks[0]
+		newTitle := "Buy food"
+		dto := models.UpdateTaskDTO{Title: &newTitle}
+		updatedTask := store.UpdateTaskById(task.Id, dto)
+		wantedTask := models.Task{Id: task.Id, Title: newTitle}
+		assert.Equals(t, updatedTask, wantedTask)
+
+		retrievedTask, err := store.GetTaskById(task.Id)
+		assert.HasNoError(t, err)
+		assert.Equals(t, retrievedTask, wantedTask)
+	})
 }

@@ -13,4 +13,5 @@ type Store interface {
 	DeleteTaskById(id int) error
 	GetTaskById(id int) (models.Task, error)
 	GetTasks() ([]models.Task, error)
+	UpdateTaskById(id int, dto models.UpdateTaskDTO) models.Task
 }
