@@ -416,6 +416,7 @@ func TestHandlePatchTasks(t *testing.T) {
 }
 
 var initialTasks = []models.Task{{1, "Pack clothes"}}
+var forcedError = errors.New("forced error")
 
 type mockStore struct {
 	createTaskCalls  int
@@ -434,7 +435,7 @@ func newMockStore(shouldError bool) *mockStore {
 func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
 	m.createTaskCalls++
 	if m.shouldError {
-		return models.Task{}, errors.New("forced error")
+		return models.Task{}, forcedError
 	}
 	return task, nil
 }
@@ -446,7 +447,7 @@ func (m *mockStore) GetTaskById(id int) (models.Task, error) {
 		if id == -1 {
 			return task, data.ErrResourceNotFound
 		} else {
-			return task, errors.New("forced error")
+			return task, forcedError
 		}
 	}
 	tasks, _ := m.GetTasks()
@@ -459,14 +460,14 @@ func (m *mockStore) GetTaskById(id int) (models.Task, error) {
 func (m *mockStore) GetTasks() ([]models.Task, error) {
 	m.getTasksCalls++
 	if m.shouldError {
-		return nil, errors.New("forced error")
+		return nil, forcedError
 	}
 	return m.tasks, nil
 }
 
 func (m *mockStore) DeleteTaskById(id int) error {
 	if m.shouldError {
-		return errors.New("forced error")
+		return forcedError
 	}
 	i := slices.IndexFunc(m.tasks, func(task models.Task) bool {
 		return task.Id == id
@@ -483,7 +484,7 @@ func (m *mockStore) DeleteTaskById(id int) error {
 func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 	m.updateTaskCalls++
 	if m.shouldError {
-		return models.Task{}, errors.New("forced error")
+		return models.Task{}, forcedError
 	}
 	for i, t := range m.tasks {
 		if t.Id == task.Id {
