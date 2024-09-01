@@ -95,7 +95,11 @@ func (s *Server) HandlePatchTaskById(w http.ResponseWriter, r *http.Request) {
 
 	task := models.Task{Id: id}
 	_ = json.NewDecoder(r.Body).Decode(&task) // TODO: handle error
-	updatedTask, _ := s.store.UpdateTask(task)
+	updatedTask, err := s.store.UpdateTask(task)
+	if err != nil && errors.Is(err, data.ErrResourceNotFound) {
+		http.Error(w, err.Error(), http.StatusNotFound)
+	}
+
 	_ = json.NewEncoder(w).Encode(updatedTask) // TODO: handle error
 }
 

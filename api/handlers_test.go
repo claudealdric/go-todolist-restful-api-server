@@ -350,6 +350,28 @@ func TestHandlePatchTasks(t *testing.T) {
 		assert.Status(t, response.Code, http.StatusBadRequest)
 		assert.Calls(t, data.updateTaskCalls, 0)
 	})
+
+	t.Run("responds with a 404 Not Found when the task cannot be found", func(t *testing.T) {
+		data := newMockStore(false)
+		server := NewServer(data)
+
+		doesNotExistId := -1
+		newTitle := "Pack bags"
+		dto := models.UpdateTaskDTO{Title: &newTitle}
+		jsonData, err := json.Marshal(dto)
+		assert.HasNoError(t, err)
+
+		request := httptest.NewRequest(
+			http.MethodPatch,
+			fmt.Sprintf("/tasks/%d", doesNotExistId),
+			bytes.NewBuffer(jsonData),
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusNotFound)
+		assert.Calls(t, data.updateTaskCalls, 1)
+	})
 }
 
 var initialTasks = []models.Task{{1, "Pack clothes"}}
@@ -422,8 +444,8 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 	for i, t := range m.tasks {
 		if t.Id == task.Id {
 			m.tasks[i] = task
-			break
+			return task, nil
 		}
 	}
-	return task, nil
+	return models.Task{}, data.ErrResourceNotFound
 }
