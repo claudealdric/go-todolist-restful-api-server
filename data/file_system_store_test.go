@@ -137,4 +137,21 @@ func TestFileSystemStore(t *testing.T) {
 		assert.HasNoError(t, err)
 		assert.Equals(t, retrievedTask, wantedTask)
 	})
+
+	t.Run("UpdateTaskById returns an error with an invalid ID", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonTasks))
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+		assert.HasNoError(t, err)
+
+		newTitle := "Buy food"
+		_, err = store.UpdateTask(
+			models.Task{
+				Id:    -1,
+				Title: newTitle,
+			},
+		)
+		assert.HasError(t, err)
+	})
 }
