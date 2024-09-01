@@ -83,7 +83,7 @@ func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandlePatchTaskById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
-	id, err := strconv.Atoi(r.PathValue("id")) // TODO: handle error
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(
 			w,
