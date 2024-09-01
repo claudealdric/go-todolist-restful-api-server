@@ -295,12 +295,48 @@ func TestHandlePostTasks(t *testing.T) {
 	})
 }
 
+func TestHandlePatchTasks(t *testing.T) {
+	t.Run("returns the updated task and responds with a 200 OK status", func(t *testing.T) {
+		data := newMockStore(false)
+		server := NewServer(data)
+
+		task := initialTasks[0]
+
+		newTitle := "Pack bags"
+		dto := models.UpdateTaskDTO{Title: &newTitle}
+		jsonData, err := json.Marshal(dto)
+		assert.HasNoError(t, err)
+
+		request := httptest.NewRequest(
+			http.MethodPatch,
+			fmt.Sprintf("/tasks/%d", task.Id),
+			bytes.NewBuffer(jsonData),
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.ContentType(
+			t,
+			testutils.GetContentTypeFromResponse(response),
+			jsonContentType,
+		)
+		assert.Status(t, response.Code, http.StatusOK)
+		assert.Calls(t, data.updateTaskCalls, 1)
+		assert.Equals(
+			t,
+			testutils.GetTaskFromResponse(t, response.Body),
+			models.Task{Id: task.Id, Title: newTitle},
+		)
+	})
+}
+
 var initialTasks = []models.Task{{1, "Pack clothes"}}
 
 type mockStore struct {
 	createTaskCalls  int
 	getTaskByIdCalls int
 	getTasksCalls    int
+	updateTaskCalls  int
 	tasks            []models.Task
 	shouldError      bool
 }
@@ -357,4 +393,15 @@ func (m *mockStore) DeleteTaskById(id int) error {
 		return task.Id == id
 	})
 	return nil
+}
+
+func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
+	m.updateTaskCalls++
+	for i, t := range m.tasks {
+		if t.Id == task.Id {
+			m.tasks[i] = task
+			break
+		}
+	}
+	return task, nil
 }

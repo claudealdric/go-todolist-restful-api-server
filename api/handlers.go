@@ -81,6 +81,15 @@ func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) HandlePatchTaskById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("content-type", jsonContentType)
+	id, _ := strconv.Atoi(r.PathValue("id")) // TODO: handle error
+	task := models.Task{Id: id}
+	_ = json.NewDecoder(r.Body).Decode(&task) // TODO: handle error
+	updatedTask, _ := s.store.UpdateTask(task)
+	_ = json.NewEncoder(w).Encode(updatedTask) // TODO: handle error
+}
+
 func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
 	var task models.Task
