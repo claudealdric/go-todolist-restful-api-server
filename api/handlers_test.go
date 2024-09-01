@@ -372,6 +372,24 @@ func TestHandlePatchTasks(t *testing.T) {
 		assert.Status(t, response.Code, http.StatusNotFound)
 		assert.Calls(t, data.updateTaskCalls, 1)
 	})
+
+	t.Run("responds with a 400 Bad Request when the body is invalid", func(t *testing.T) {
+		data := newMockStore(false)
+		server := NewServer(data)
+
+		task := initialTasks[0]
+
+		request := httptest.NewRequest(
+			http.MethodPatch,
+			fmt.Sprintf("/tasks/%d", task.Id),
+			bytes.NewBuffer([]byte(`{`)),
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusBadRequest)
+		assert.Calls(t, data.updateTaskCalls, 0)
+	})
 }
 
 var initialTasks = []models.Task{{1, "Pack clothes"}}
