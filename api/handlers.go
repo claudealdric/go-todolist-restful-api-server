@@ -83,7 +83,16 @@ func (s *Server) HandleGetTasks(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) HandlePatchTaskById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", jsonContentType)
-	id, _ := strconv.Atoi(r.PathValue("id")) // TODO: handle error
+	id, err := strconv.Atoi(r.PathValue("id")) // TODO: handle error
+	if err != nil {
+		http.Error(
+			w,
+			fmt.Sprintf("ID: %q is invalid", r.PathValue("id")),
+			http.StatusBadRequest,
+		)
+		return
+	}
+
 	task := models.Task{Id: id}
 	_ = json.NewDecoder(r.Body).Decode(&task) // TODO: handle error
 	updatedTask, _ := s.store.UpdateTask(task)

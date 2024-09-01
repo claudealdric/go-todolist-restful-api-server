@@ -328,6 +328,28 @@ func TestHandlePatchTasks(t *testing.T) {
 			models.Task{Id: task.Id, Title: newTitle},
 		)
 	})
+
+	t.Run("responds with a 400 Bad Request with an invalid ID", func(t *testing.T) {
+		data := newMockStore(false)
+		server := NewServer(data)
+
+		invalidId := "not-an-integer"
+		newTitle := "Pack bags"
+		dto := models.UpdateTaskDTO{Title: &newTitle}
+		jsonData, err := json.Marshal(dto)
+		assert.HasNoError(t, err)
+
+		request := httptest.NewRequest(
+			http.MethodPatch,
+			fmt.Sprintf("/tasks/%s", invalidId),
+			bytes.NewBuffer(jsonData),
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusBadRequest)
+		assert.Calls(t, data.updateTaskCalls, 0)
+	})
 }
 
 var initialTasks = []models.Task{{1, "Pack clothes"}}
