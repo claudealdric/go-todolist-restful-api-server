@@ -11,7 +11,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
 )
 
-func TestHandleDeleteTaskById(t *testing.T) {
+func TestHandleDeleteTask(t *testing.T) {
 	t.Run("deletes the task and responds with 204 No Content", func(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)

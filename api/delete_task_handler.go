@@ -9,8 +9,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/data"
 )
 
-// TODO: rename
-func (s *Server) HandleDeleteTaskById(w http.ResponseWriter, r *http.Request) {
+func (s *Server) HandleDeleteTask(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.Error(

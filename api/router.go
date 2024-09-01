@@ -12,7 +12,7 @@ func NewRouter(s *Server) *http.ServeMux {
 	mux.HandleFunc(get("/tasks/{id}"), s.HandleGetTaskById)
 	mux.HandleFunc("PATCH /tasks/{id}", s.HandlePatchTaskById)
 	mux.HandleFunc("POST /tasks", s.HandlePostTasks)
-	mux.HandleFunc("DELETE /tasks/{id}", s.HandleDeleteTaskById)
+	mux.HandleFunc("DELETE /tasks/{id}", s.HandleDeleteTask)
 	return mux
 }
 
