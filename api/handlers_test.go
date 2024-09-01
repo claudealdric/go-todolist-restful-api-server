@@ -413,6 +413,43 @@ func TestHandlePatchTasks(t *testing.T) {
 		assert.Status(t, response.Code, http.StatusInternalServerError)
 		assert.Calls(t, data.updateTaskCalls, 1)
 	})
+
+	t.Run("providing the ID in the request body does not override the ID URL param", func(t *testing.T) {
+		data := newMockStore(false)
+		server := NewServer(data)
+		unmodifiedTask := models.Task{Id: 2, Title: "Exercise"}
+		server.store.CreateTask(unmodifiedTask)
+
+		taskToUpdate := initialTasks[0]
+
+		newTitle := "Pack bags"
+		jsonData, err := json.Marshal(models.Task{Id: 2, Title: newTitle})
+		assert.HasNoError(t, err)
+
+		request := httptest.NewRequest(
+			http.MethodPatch,
+			fmt.Sprintf("/tasks/%d", taskToUpdate.Id),
+			bytes.NewBuffer(jsonData),
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.ContentType(
+			t,
+			testutils.GetContentTypeFromResponse(response),
+			jsonContentType,
+		)
+		assert.Status(t, response.Code, http.StatusOK)
+		assert.Calls(t, data.updateTaskCalls, 1)
+		assert.Equals(
+			t,
+			testutils.GetTaskFromResponse(t, response.Body),
+			models.Task{Id: taskToUpdate.Id, Title: newTitle},
+		)
+
+		gotUnmodifiedTask, _ := server.store.GetTaskById(unmodifiedTask.Id)
+		assert.Equals(t, gotUnmodifiedTask, unmodifiedTask)
+	})
 }
 
 var initialTasks = []models.Task{{1, "Pack clothes"}}
@@ -437,6 +474,7 @@ func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
 	if m.shouldError {
 		return models.Task{}, forcedError
 	}
+	m.tasks = append(m.tasks, task)
 	return task, nil
 }
 

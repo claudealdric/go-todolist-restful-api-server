@@ -93,12 +93,13 @@ func (s *Server) HandlePatchTaskById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task := models.Task{Id: id}
+	var task models.Task
 	err = json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	task.Id = id
 
 	updatedTask, err := s.store.UpdateTask(task)
 	if errors.Is(err, data.ErrResourceNotFound) {
