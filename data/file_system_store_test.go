@@ -123,12 +123,13 @@ func TestFileSystemStore(t *testing.T) {
 
 		task := initialTasks[0]
 		newTitle := "Buy food"
-		updatedTask := store.UpdateTask(
+		updatedTask, err := store.UpdateTask(
 			models.Task{
 				Id:    task.Id,
 				Title: newTitle,
 			},
 		)
+		assert.HasNoError(t, err)
 		wantedTask := models.Task{Id: task.Id, Title: newTitle}
 		assert.Equals(t, updatedTask, wantedTask)
 

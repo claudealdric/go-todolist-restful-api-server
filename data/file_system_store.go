@@ -94,9 +94,14 @@ func (f *FileSystemStore) DeleteTaskById(id int) error {
 	return f.overwriteFile(tasks)
 }
 
-func (f *FileSystemStore) UpdateTask(task models.Task) models.Task {
-	tasks, _ := f.GetTasks()                  // TODO: handle error
-	taskToUpdate, _ := f.GetTaskById(task.Id) // TODO: handle error
+func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
+	var taskToUpdate models.Task
+	tasks, err := f.GetTasks()
+	if err != nil {
+		return taskToUpdate, err
+	}
+
+	taskToUpdate, _ = f.GetTaskById(task.Id) // TODO: handle error
 	taskToUpdate.Title = task.Title
 	for i, t := range tasks {
 		if t.Id == task.Id {
@@ -105,7 +110,7 @@ func (f *FileSystemStore) UpdateTask(task models.Task) models.Task {
 		}
 	}
 	f.overwriteFile(tasks)
-	return taskToUpdate
+	return taskToUpdate, nil
 }
 
 func (f *FileSystemStore) getTasksFromFile() ([]models.Task, error) {
