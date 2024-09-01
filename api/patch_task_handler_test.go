@@ -13,7 +13,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
 )
 
-func TestHandlePatchTasks(t *testing.T) {
+func TestHandlePatchTask(t *testing.T) {
 	t.Run("returns the updated task and responds with a 200 OK status", func(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)
