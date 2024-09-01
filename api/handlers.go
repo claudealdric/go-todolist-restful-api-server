@@ -110,7 +110,11 @@ func (s *Server) HandlePatchTaskById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(updatedTask) // TODO: handle error
+	err = json.NewEncoder(w).Encode(updatedTask)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) HandlePostTasks(w http.ResponseWriter, r *http.Request) {
