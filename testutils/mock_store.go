@@ -18,17 +18,17 @@ type mockStore struct {
 	GetTasksCalls    int
 	UpdateTaskCalls  int
 	tasks            []models.Task
-	shouldError      bool
+	shouldForceError bool
 }
 
 func NewMockStore(shouldError bool) *mockStore {
-	m := &mockStore{tasks: initialMockStoreTasks, shouldError: shouldError}
+	m := &mockStore{tasks: initialMockStoreTasks, shouldForceError: shouldError}
 	return m
 }
 
 func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
 	m.CreateTaskCalls++
-	if m.shouldError {
+	if m.shouldForceError {
 		return models.Task{}, forcedError
 	}
 	m.tasks = append(m.tasks, task)
@@ -42,7 +42,7 @@ func (m *mockStore) GetInitialTasks() []models.Task {
 func (m *mockStore) GetTaskById(id int) (models.Task, error) {
 	m.GetTaskByIdCalls++
 	var task models.Task
-	if m.shouldError {
+	if m.shouldForceError {
 		if id == -1 {
 			return task, data.ErrResourceNotFound
 		} else {
@@ -58,14 +58,14 @@ func (m *mockStore) GetTaskById(id int) (models.Task, error) {
 
 func (m *mockStore) GetTasks() ([]models.Task, error) {
 	m.GetTasksCalls++
-	if m.shouldError {
+	if m.shouldForceError {
 		return nil, forcedError
 	}
 	return m.tasks, nil
 }
 
 func (m *mockStore) DeleteTaskById(id int) error {
-	if m.shouldError {
+	if m.shouldForceError {
 		return forcedError
 	}
 	i := slices.IndexFunc(m.tasks, func(task models.Task) bool {
@@ -82,7 +82,7 @@ func (m *mockStore) DeleteTaskById(id int) error {
 
 func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 	m.UpdateTaskCalls++
-	if m.shouldError {
+	if m.shouldForceError {
 		return models.Task{}, forcedError
 	}
 	for i, t := range m.tasks {
