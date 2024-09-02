@@ -35,10 +35,6 @@ func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
 	return task, nil
 }
 
-func (m *mockStore) GetInitialTasks() []models.Task {
-	return initialMockStoreTasks
-}
-
 func (m *mockStore) GetTaskById(id int) (models.Task, error) {
 	m.GetTaskByIdCalls++
 	var task models.Task

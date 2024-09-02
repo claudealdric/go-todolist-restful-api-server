@@ -28,7 +28,7 @@ func TestHandleGetTasks(t *testing.T) {
 		assert.Equals(
 			t,
 			testutils.GetTasksFromResponse(t, response.Body),
-			data.GetInitialTasks(),
+			data.Tasks,
 		)
 	})
 
