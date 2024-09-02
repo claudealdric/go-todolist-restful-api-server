@@ -16,33 +16,22 @@ func TestHandleDeleteTask(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)
 
-		tasks, err := data.GetTasks()
-		assert.HasNoError(t, err)
-		initialTasksCount := len(tasks)
+		initialTasksCount := len(data.Tasks)
 		if initialTasksCount == 0 {
 			t.Error("expected at least one initial task")
 		}
 
-		taskToDelete := tasks[0]
+		taskToDelete := data.Tasks[0]
 		request := httptest.NewRequest(
 			http.MethodDelete,
 			fmt.Sprintf("/tasks/%d", taskToDelete.Id),
 			nil,
 		)
 		response := httptest.NewRecorder()
-
 		server.Handler.ServeHTTP(response, request)
-		assert.Status(t, response.Code, http.StatusNoContent)
 
-		tasks, err = data.GetTasks()
-		assert.HasNoError(t, err)
-		if len(tasks) != initialTasksCount-1 {
-			t.Errorf(
-				"expected a slice of length %d; received %+v",
-				initialTasksCount-1,
-				tasks,
-			)
-		}
+		assert.Status(t, response.Code, http.StatusNoContent)
+		assert.HasLength(t, data.Tasks, initialTasksCount-1)
 	})
 
 	t.Run("responds with a 400 Bad Request when sending a non-integer ID", func(t *testing.T) {
@@ -55,8 +44,8 @@ func TestHandleDeleteTask(t *testing.T) {
 			nil,
 		)
 		response := httptest.NewRecorder()
-
 		server.Handler.ServeHTTP(response, request)
+
 		assert.Status(t, response.Code, http.StatusBadRequest)
 	})
 

@@ -56,6 +56,13 @@ func HasNoError(t testing.TB, err error) {
 	}
 }
 
+func HasLength[T any](t testing.TB, s []T, length int) {
+	t.Helper()
+	if len(s) != length {
+		t.Errorf("expected a slice of length %d; received %d", len(s), length)
+	}
+}
+
 func Equals[T any](t testing.TB, got, want T) {
 	t.Helper()
 	switch v := any(got).(type) {

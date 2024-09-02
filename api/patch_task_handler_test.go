@@ -136,6 +136,7 @@ func TestHandlePatchTask(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		unmodifiedTask := models.Task{Id: 2, Title: "Exercise"}
 		data.Tasks = append(data.Tasks, unmodifiedTask)
+		unmodifiedTaskIndex := len(data.Tasks) - 1
 		server := NewServer(data)
 
 		taskToUpdate := data.Tasks[0]
@@ -165,7 +166,6 @@ func TestHandlePatchTask(t *testing.T) {
 			models.Task{Id: taskToUpdate.Id, Title: newTitle},
 		)
 
-		gotUnmodifiedTask, _ := server.store.GetTaskById(unmodifiedTask.Id)
-		assert.Equals(t, gotUnmodifiedTask, unmodifiedTask)
+		assert.Equals(t, data.Tasks[unmodifiedTaskIndex], unmodifiedTask)
 	})
 }
