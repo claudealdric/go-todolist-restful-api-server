@@ -76,11 +76,12 @@ func TestFileSystemStore(t *testing.T) {
 
 		assert.HasNoError(t, err)
 
-		newTask := models.Task{2, "Launder clothes"}
-		store.CreateTask(newTask)
-		tasks, err := store.GetTasks()
-
+		newTask, err := store.CreateTask(models.CreateTaskDTO{"Launder clothes"})
 		assert.HasNoError(t, err)
+
+		tasks, err := store.GetTasks()
+		assert.HasNoError(t, err)
+
 		assert.Contains(t, tasks, newTask)
 	})
 

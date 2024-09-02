@@ -19,18 +19,24 @@ type mockStore struct {
 	UpdateTaskCalls  int
 	Tasks            []models.Task
 	shouldForceError bool
+	lastId           int
 }
 
 func NewMockStore(shouldError bool) *mockStore {
-	m := &mockStore{Tasks: initialMockStoreTasks, shouldForceError: shouldError}
+	m := &mockStore{
+		Tasks:            initialMockStoreTasks,
+		shouldForceError: shouldError,
+		lastId:           1,
+	}
 	return m
 }
 
-func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
+func (m *mockStore) CreateTask(dto models.CreateTaskDTO) (models.Task, error) {
 	m.CreateTaskCalls++
 	if m.shouldForceError {
 		return models.Task{}, forcedError
 	}
+	task := models.Task{Id: m.getNewId(), Title: dto.Title}
 	m.Tasks = append(m.Tasks, task)
 	return task, nil
 }
@@ -88,4 +94,10 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 		}
 	}
 	return models.Task{}, data.ErrResourceNotFound
+}
+
+func (m *mockStore) getNewId() int {
+	newId := m.lastId + 1
+	m.lastId++
+	return newId
 }

@@ -14,6 +14,7 @@ import (
 type FileSystemStore struct {
 	encoder *json.Encoder
 	decoder *json.Decoder
+	lastId  int
 }
 
 func NewFileSystemStore(file *os.File) (*FileSystemStore, error) {
@@ -34,6 +35,7 @@ func NewFileSystemStore(file *os.File) (*FileSystemStore, error) {
 	return &FileSystemStore{
 		json.NewEncoder(&tape{file}),
 		json.NewDecoder(&tape{file}),
+		0,
 	}, nil
 }
 
@@ -64,10 +66,15 @@ func (f *FileSystemStore) GetTasks() ([]models.Task, error) {
 	return tasks, nil
 }
 
-func (f *FileSystemStore) CreateTask(task models.Task) (models.Task, error) {
+func (f *FileSystemStore) CreateTask(dto models.CreateTaskDTO) (models.Task, error) {
 	tasks, err := f.GetTasks()
 	if err != nil {
 		return models.Task{}, err
+	}
+	newId := f.getNewId()
+	task := models.Task{
+		Id:    newId,
+		Title: dto.Title,
 	}
 	tasks = append(tasks, task)
 	err = f.overwriteFile(tasks)
@@ -135,6 +142,12 @@ func (f *FileSystemStore) overwriteFile(data any) error {
 		return fmt.Errorf("error writing to file: %w", err)
 	}
 	return nil
+}
+
+func (f *FileSystemStore) getNewId() int {
+	newId := f.lastId + 1
+	f.lastId = newId
+	return newId
 }
 
 func initializeDBFile(file *os.File) error {
