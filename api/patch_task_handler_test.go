@@ -134,9 +134,9 @@ func TestHandlePatchTask(t *testing.T) {
 
 	t.Run("providing the ID in the request body does not override the ID URL param", func(t *testing.T) {
 		data := testutils.NewMockStore(false)
-		server := NewServer(data)
 		unmodifiedTask := models.Task{Id: 2, Title: "Exercise"}
-		server.store.CreateTask(unmodifiedTask)
+		data.Tasks = append(data.Tasks, unmodifiedTask)
+		server := NewServer(data)
 
 		taskToUpdate := data.GetInitialTasks()[0]
 
