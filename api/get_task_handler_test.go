@@ -15,7 +15,7 @@ func TestHandleGetTaskById(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)
 
-		wantedTask := testutils.InitialMockStoreTasks[0]
+		wantedTask := data.GetInitialTasks()[0]
 		request := httptest.NewRequest(
 			http.MethodGet,
 			fmt.Sprintf("/tasks/%d", wantedTask.Id),

@@ -9,7 +9,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/utils"
 )
 
-var InitialMockStoreTasks = []models.Task{{1, "Pack clothes"}}
+var initialMockStoreTasks = []models.Task{{1, "Pack clothes"}}
 var forcedError = errors.New("forced error")
 
 type mockStore struct {
@@ -22,7 +22,7 @@ type mockStore struct {
 }
 
 func NewMockStore(shouldError bool) *mockStore {
-	m := &mockStore{tasks: InitialMockStoreTasks, shouldError: shouldError}
+	m := &mockStore{tasks: initialMockStoreTasks, shouldError: shouldError}
 	return m
 }
 
@@ -33,6 +33,10 @@ func (m *mockStore) CreateTask(task models.Task) (models.Task, error) {
 	}
 	m.tasks = append(m.tasks, task)
 	return task, nil
+}
+
+func (m *mockStore) GetInitialTasks() []models.Task {
+	return initialMockStoreTasks
 }
 
 func (m *mockStore) GetTaskById(id int) (models.Task, error) {

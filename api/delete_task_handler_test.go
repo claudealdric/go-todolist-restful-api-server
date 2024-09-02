@@ -80,7 +80,7 @@ func TestHandleDeleteTask(t *testing.T) {
 		data := testutils.NewMockStore(true)
 		server := NewServer(data)
 
-		taskToDelete := testutils.InitialMockStoreTasks[0]
+		taskToDelete := data.GetInitialTasks()[0]
 		request := httptest.NewRequest(
 			http.MethodDelete,
 			fmt.Sprintf("/tasks/%d", taskToDelete.Id),

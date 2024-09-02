@@ -18,7 +18,7 @@ func TestHandlePatchTask(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)
 
-		task := testutils.InitialMockStoreTasks[0]
+		task := data.GetInitialTasks()[0]
 
 		newTitle := "Pack bags"
 		dto := models.UpdateTaskDTO{Title: &newTitle}
@@ -95,7 +95,7 @@ func TestHandlePatchTask(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)
 
-		task := testutils.InitialMockStoreTasks[0]
+		task := data.GetInitialTasks()[0]
 
 		request := httptest.NewRequest(
 			http.MethodPatch,
@@ -113,7 +113,7 @@ func TestHandlePatchTask(t *testing.T) {
 		data := testutils.NewMockStore(true)
 		server := NewServer(data)
 
-		task := testutils.InitialMockStoreTasks[0]
+		task := data.GetInitialTasks()[0]
 
 		newTitle := "Pack bags"
 		dto := models.UpdateTaskDTO{Title: &newTitle}
@@ -138,7 +138,7 @@ func TestHandlePatchTask(t *testing.T) {
 		unmodifiedTask := models.Task{Id: 2, Title: "Exercise"}
 		server.store.CreateTask(unmodifiedTask)
 
-		taskToUpdate := testutils.InitialMockStoreTasks[0]
+		taskToUpdate := data.GetInitialTasks()[0]
 
 		newTitle := "Pack bags"
 		jsonData, err := json.Marshal(models.Task{Id: 2, Title: newTitle})
