@@ -5,6 +5,10 @@ type Task struct {
 	Title string `json:"title"`
 }
 
+func NewTask(id int, title string) *Task {
+	return &Task{id, title}
+}
+
 type CreateTaskDTO struct {
 	Title string `json:"title"`
 }

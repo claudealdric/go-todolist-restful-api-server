@@ -11,7 +11,7 @@ import (
 )
 
 func TestFileSystemStore(t *testing.T) {
-	initialTasks := []models.Task{{1, "Buy groceries"}}
+	initialTasks := []models.Task{*models.NewTask(1, "Buy groceries")}
 	jsonTasks, err := utils.ConvertToJSON(initialTasks)
 
 	assert.HasNoError(t, err)

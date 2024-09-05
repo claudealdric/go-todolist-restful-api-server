@@ -23,12 +23,13 @@ func TestServer(t *testing.T) {
 	server := api.NewServer(store)
 
 	initialTasks := []models.Task{
-		{1, "Buy groceries"},
-		{2, "Pack clothes"},
+		*models.NewTask(1, "Buy groceries"),
+		*models.NewTask(2, "Pack clothes"),
 	}
 
 	for _, task := range initialTasks {
-		_, err := sendPostTask(server, task)
+		dto := models.CreateTaskDTO{task.Title}
+		_, err := sendPostTask(server, dto)
 		assert.HasNoError(t, err)
 	}
 
@@ -68,10 +69,10 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("deletes the task with DELETE `/tasks/{id}`", func(t *testing.T) {
-		newTask := models.Task{3, "Cook food"}
-		postResponse, err := sendPostTask(server, newTask)
+		newTaskDto := models.CreateTaskDTO{"Cook food"}
+		postResponse, err := sendPostTask(server, newTaskDto)
 		assert.HasNoError(t, err)
-		newTask = testutils.GetTaskFromResponse(t, postResponse.Body)
+		newTask := testutils.GetTaskFromResponse(t, postResponse.Body)
 
 		deleteRequest := httptest.NewRequest(
 			http.MethodDelete,
@@ -88,25 +89,26 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("updates the task with PATCH `/tasks/{id}`", func(t *testing.T) {
-		taskId := 4
-		task := models.Task{taskId, "Walk the dog"}
-		_, err := sendPostTask(server, task)
+		newTaskDto := models.CreateTaskDTO{"Walk the dog"}
+		postResponse, err := sendPostTask(server, newTaskDto)
 		assert.HasNoError(t, err)
+
+		taskId := testutils.GetTaskFromResponse(t, postResponse.Body).Id
 
 		newTitle := "Walk the cat"
 		updateTaskDTO := models.UpdateTaskDTO{Title: &newTitle}
 		patchResponse, err := sendPatchTask(server, updateTaskDTO, taskId)
 		assert.HasNoError(t, err)
 
-		wantedTask := models.Task{taskId, *updateTaskDTO.Title}
+		wantedTask := models.NewTask(taskId, *updateTaskDTO.Title)
 
 		updatedTask := testutils.GetTaskFromResponse(t, patchResponse.Body)
 		assert.Status(t, patchResponse.Code, http.StatusOK)
-		assert.Equals(t, updatedTask, wantedTask)
+		assert.Equals(t, updatedTask, *wantedTask)
 
 		getResponse := sendGetTaskById(server, taskId)
-		task = testutils.GetTaskFromResponse(t, getResponse.Body)
-		assert.Equals(t, task, wantedTask)
+		task := testutils.GetTaskFromResponse(t, getResponse.Body)
+		assert.Equals(t, task, *wantedTask)
 	})
 }
 
@@ -150,7 +152,10 @@ func sendPatchTask(
 	return response, nil
 }
 
-func sendPostTask(server *api.Server, task models.Task) (*httptest.ResponseRecorder, error) {
+func sendPostTask(server *api.Server, task models.CreateTaskDTO) (
+	*httptest.ResponseRecorder,
+	error,
+) {
 	jsonBody, err := json.Marshal(task)
 	if err != nil {
 		return nil, err

@@ -53,7 +53,7 @@ func TestHandleDeleteTask(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)
 
-		taskToDelete := models.Task{-1, "Does not exist"}
+		taskToDelete := models.NewTask(-1, "Does not exist")
 		request := httptest.NewRequest(
 			http.MethodDelete,
 			fmt.Sprintf("/tasks/%d", taskToDelete.Id),

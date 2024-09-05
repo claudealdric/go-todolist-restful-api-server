@@ -17,7 +17,7 @@ func TestHandlePostTask(t *testing.T) {
 		data := testutils.NewMockStore(false)
 		server := NewServer(data)
 
-		newTask := models.Task{2, "Exercise"}
+		newTask := models.NewTask(2, "Exercise")
 		jsonData, err := json.Marshal(newTask)
 		assert.HasNoError(t, err)
 		request := httptest.NewRequest(
@@ -38,7 +38,7 @@ func TestHandlePostTask(t *testing.T) {
 		assert.Equals(
 			t,
 			testutils.GetTaskFromResponse(t, response.Body),
-			newTask,
+			*newTask,
 		)
 	})
 
@@ -63,7 +63,7 @@ func TestHandlePostTask(t *testing.T) {
 		data := testutils.NewMockStore(true)
 		server := NewServer(data)
 
-		newTask := models.Task{2, "Exercise"}
+		newTask := models.NewTask(2, "Exercise")
 		jsonData, err := json.Marshal(newTask)
 		assert.HasNoError(t, err)
 		request := httptest.NewRequest(
