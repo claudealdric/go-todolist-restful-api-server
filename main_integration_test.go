@@ -28,7 +28,7 @@ func TestServer(t *testing.T) {
 	}
 
 	for _, task := range initialTasks {
-		dto := models.CreateTaskDTO{task.Title}
+		dto := models.NewCreateTaskDTO(task.Title)
 		_, err := sendPostTask(server, dto)
 		assert.HasNoError(t, err)
 	}
@@ -69,7 +69,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("deletes the task with DELETE `/tasks/{id}`", func(t *testing.T) {
-		newTaskDto := models.CreateTaskDTO{"Cook food"}
+		newTaskDto := models.NewCreateTaskDTO("Cook food")
 		postResponse, err := sendPostTask(server, newTaskDto)
 		assert.HasNoError(t, err)
 		newTask := testutils.GetTaskFromResponse(t, postResponse.Body)
@@ -89,7 +89,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("updates the task with PATCH `/tasks/{id}`", func(t *testing.T) {
-		newTaskDto := models.CreateTaskDTO{"Walk the dog"}
+		newTaskDto := models.NewCreateTaskDTO("Walk the dog")
 		postResponse, err := sendPostTask(server, newTaskDto)
 		assert.HasNoError(t, err)
 
@@ -152,7 +152,7 @@ func sendPatchTask(
 	return response, nil
 }
 
-func sendPostTask(server *api.Server, task models.CreateTaskDTO) (
+func sendPostTask(server *api.Server, task *models.CreateTaskDTO) (
 	*httptest.ResponseRecorder,
 	error,
 ) {

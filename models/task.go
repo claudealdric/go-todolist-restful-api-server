@@ -13,6 +13,10 @@ type CreateTaskDTO struct {
 	Title string `json:"title"`
 }
 
+func NewCreateTaskDTO(title string) *CreateTaskDTO {
+	return &CreateTaskDTO{Title: title}
+}
+
 type UpdateTaskDTO struct {
 	Title *string `json:"title,omitempty"`
 }
