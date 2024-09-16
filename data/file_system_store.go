@@ -12,9 +12,10 @@ import (
 )
 
 type FileSystemStore struct {
-	encoder *json.Encoder
-	decoder *json.Decoder
-	lastId  int
+	encoder    *json.Encoder
+	decoder    *json.Decoder
+	lastTaskId int
+	lastUserId int
 }
 
 func NewFileSystemStore(file *os.File) (*FileSystemStore, error) {
@@ -35,6 +36,7 @@ func NewFileSystemStore(file *os.File) (*FileSystemStore, error) {
 	return &FileSystemStore{
 		json.NewEncoder(&tape{file}),
 		json.NewDecoder(&tape{file}),
+		0,
 		0,
 	}, nil
 }
@@ -71,7 +73,7 @@ func (f *FileSystemStore) CreateTask(dto models.CreateTaskDTO) (models.Task, err
 	if err != nil {
 		return models.Task{}, err
 	}
-	newId := f.getNewId()
+	newId := f.getNewTaskId()
 	task := models.Task{
 		Id:    newId,
 		Title: dto.Title,
@@ -146,6 +148,26 @@ func (f *FileSystemStore) GetUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
+func (f *FileSystemStore) CreateUser(dto models.CreateUserDTO) (models.User, error) {
+	users, err := f.GetUsers()
+	if err != nil {
+		return models.User{}, err
+	}
+	newId := f.getNewUserId()
+	user := models.User{
+		Id:       newId,
+		Name:     dto.Name,
+		Email:    dto.Email,
+		Password: dto.Password,
+	}
+	users = append(users, user)
+	err = f.overwriteFile(users)
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
+}
+
 func (f *FileSystemStore) GetUsers() ([]models.User, error) {
 	users, err := f.getUsersFromFile()
 	if err != nil {
@@ -180,10 +202,16 @@ func (f *FileSystemStore) overwriteFile(data any) error {
 	return nil
 }
 
-func (f *FileSystemStore) getNewId() int {
-	newId := f.lastId + 1
-	f.lastId = newId
-	return newId
+func (f *FileSystemStore) getNewTaskId() int {
+	newTaskId := f.lastTaskId + 1
+	f.lastTaskId = newTaskId
+	return newTaskId
+}
+
+func (f *FileSystemStore) getNewUserId() int {
+	newUserId := f.lastUserId + 1
+	f.lastUserId = newUserId
+	return newUserId
 }
 
 func initializeDBFile(file *os.File) error {

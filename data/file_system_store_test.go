@@ -177,6 +177,34 @@ func TestFileSystemStoreUsers(t *testing.T) {
 		assert.HasNoError(t, err)
 	})
 
+	t.Run("CreateUser stores and returns the created user", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, "")
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+
+		assert.HasNoError(t, err)
+
+		dto := models.CreateUserDTO{
+			Name:     "John Doe",
+			Email:    "john.doe@email.com",
+			Password: "password",
+		}
+		newUser, err := store.CreateUser(dto)
+		wantedUser := models.User{
+			Id:       1,
+			Name:     dto.Name,
+			Email:    dto.Email,
+			Password: dto.Password,
+		}
+		assert.HasNoError(t, err)
+		assert.Equals(t, newUser, wantedUser)
+
+		users, err := store.GetUsers()
+		assert.HasNoError(t, err)
+		assert.Contains(t, users, newUser)
+	})
+
 	t.Run("GetUserByEmail returns the correct user if it exists", func(t *testing.T) {
 		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonUsers))
 		defer cleanDatabase()
