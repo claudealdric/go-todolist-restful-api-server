@@ -131,7 +131,7 @@ func TestFileSystemStoreTasks(t *testing.T) {
 		)
 		assert.HasNoError(t, err)
 		wantedTask := models.Task{Id: task.Id, Title: newTitle}
-		assert.Equals(t, updatedTask, wantedTask)
+		assert.Equals(t, *updatedTask, wantedTask)
 
 		retrievedTask, err := store.GetTaskById(task.Id)
 		assert.HasNoError(t, err)

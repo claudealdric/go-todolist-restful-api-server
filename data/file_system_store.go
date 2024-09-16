@@ -102,15 +102,15 @@ func (f *FileSystemStore) DeleteTaskById(id int) error {
 	return f.overwriteFile(tasks)
 }
 
-func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
+func (f *FileSystemStore) UpdateTask(task models.Task) (*models.Task, error) {
 	tasks, err := f.GetTasks()
 	if err != nil {
-		return models.Task{}, err
+		return nil, err
 	}
 
 	taskToUpdate, err := f.GetTaskById(task.Id)
 	if err != nil {
-		return models.Task{}, err
+		return nil, err
 	}
 
 	taskToUpdate.Title = task.Title
@@ -122,10 +122,10 @@ func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
 	}
 	err = f.overwriteFile(tasks)
 	if err != nil {
-		return models.Task{}, err
+		return nil, err
 	}
 
-	return *taskToUpdate, nil
+	return taskToUpdate, nil
 }
 
 func (f *FileSystemStore) GetUserByEmail(email string) (*models.User, error) {

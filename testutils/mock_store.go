@@ -86,18 +86,18 @@ func (m *mockStore) DeleteTaskById(id int) error {
 	return nil
 }
 
-func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
+func (m *mockStore) UpdateTask(task models.Task) (*models.Task, error) {
 	m.UpdateTaskCalls++
 	if m.shouldForceError {
-		return models.Task{}, forcedError
+		return nil, forcedError
 	}
 	for i, t := range m.Tasks {
 		if t.Id == task.Id {
 			m.Tasks[i] = task
-			return task, nil
+			return &task, nil
 		}
 	}
-	return models.Task{}, data.ErrResourceNotFound
+	return nil, data.ErrResourceNotFound
 }
 
 func (m *mockStore) CreateUser(dto *models.CreateUserDTO) (*models.User, error) {
