@@ -13,7 +13,17 @@ import (
 func TestFileSystemStore(t *testing.T) {
 	initialTasks := []models.Task{*models.NewTask(1, "Buy groceries")}
 	jsonTasks, err := utils.ConvertToJSON(initialTasks)
+	assert.HasNoError(t, err)
 
+	initialUsers := []models.User{
+		models.User{
+			Id:       1,
+			Name:     "Claude Aldric",
+			Email:    "claude.aldric@email.com",
+			Password: "password",
+		},
+	}
+	jsonUsers, err := utils.ConvertToJSON(initialUsers)
 	assert.HasNoError(t, err)
 
 	t.Run("works with an empty file", func(t *testing.T) {
@@ -154,5 +164,19 @@ func TestFileSystemStore(t *testing.T) {
 			},
 		)
 		assert.HasError(t, err)
+	})
+
+	t.Run("GetUserByEmail returns the correct user if it exists", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonUsers))
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+		assert.HasNoError(t, err)
+
+		wantedUser := initialUsers[0]
+		got, err := store.GetUserByEmail(wantedUser.Email)
+
+		assert.HasNoError(t, err)
+		assert.Equals(t, got, wantedUser)
 	})
 }

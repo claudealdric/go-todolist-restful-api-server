@@ -127,6 +127,16 @@ func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
 	return taskToUpdate, nil
 }
 
+func (f *FileSystemStore) GetUserByEmail(email string) (models.User, error) {
+	var user models.User
+	users, _ := f.getUsersFromFile() // TODO: hanndle error
+	// TODO: handle not found case
+	user, _ = utils.SliceFind(users, func(u models.User) bool {
+		return u.Email == email
+	})
+	return user, nil
+}
+
 func (f *FileSystemStore) getTasksFromFile() ([]models.Task, error) {
 	var tasks []models.Task
 	err := f.decoder.Decode(&tasks)
@@ -134,6 +144,15 @@ func (f *FileSystemStore) getTasksFromFile() ([]models.Task, error) {
 		return nil, fmt.Errorf("error reading the file: %w", err)
 	}
 	return tasks, nil
+}
+
+func (f *FileSystemStore) getUsersFromFile() ([]models.User, error) {
+	var users []models.User
+	err := f.decoder.Decode(&users)
+	if err != nil {
+		return nil, fmt.Errorf("error reading the file: %w", err)
+	}
+	return users, nil
 }
 
 func (f *FileSystemStore) overwriteFile(data any) error {

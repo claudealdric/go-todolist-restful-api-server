@@ -96,6 +96,10 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 	return models.Task{}, data.ErrResourceNotFound
 }
 
+func (m *mockStore) GetUserByEmail(email string) (models.User, error) {
+	return models.User{}, nil
+}
+
 func (m *mockStore) getNewId() int {
 	newId := m.lastId + 1
 	m.lastId++
