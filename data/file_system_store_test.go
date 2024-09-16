@@ -216,7 +216,7 @@ func TestFileSystemStoreUsers(t *testing.T) {
 		got, err := store.GetUserByEmail(wantedUser.Email)
 
 		assert.HasNoError(t, err)
-		assert.Equals(t, got, wantedUser)
+		assert.Equals(t, *got, wantedUser)
 	})
 
 	t.Run("GetUserByEmail returns an `ErrNotFound` error if user does not exist", func(t *testing.T) {

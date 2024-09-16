@@ -116,15 +116,15 @@ func (m *mockStore) CreateUser(dto models.CreateUserDTO) (*models.User, error) {
 	return &user, nil
 }
 
-func (m *mockStore) GetUserByEmail(email string) (models.User, error) {
+func (m *mockStore) GetUserByEmail(email string) (*models.User, error) {
 	m.GetUserByEmailCalls++
 	if m.shouldForceError {
-		return models.User{}, forcedError
+		return nil, forcedError
 	}
 	user, _ := utils.SliceFind(m.Users, func(u models.User) bool {
 		return u.Email == email
 	})
-	return user, nil
+	return &user, nil
 }
 
 func (m *mockStore) GetUsers() ([]models.User, error) {

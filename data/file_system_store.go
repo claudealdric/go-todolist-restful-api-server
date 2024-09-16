@@ -129,23 +129,23 @@ func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
 	return taskToUpdate, nil
 }
 
-func (f *FileSystemStore) GetUserByEmail(email string) (models.User, error) {
+func (f *FileSystemStore) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
 	users, err := f.getUsersFromFile()
 	if err != nil {
-		return user, err
+		return nil, err
 	}
 	user, ok := utils.SliceFind(users, func(u models.User) bool {
 		return u.Email == email
 	})
 	if !ok {
-		return user, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"user with email %s: %w",
 			email,
 			ErrResourceNotFound,
 		)
 	}
-	return user, nil
+	return &user, nil
 }
 
 func (f *FileSystemStore) CreateUser(dto models.CreateUserDTO) (*models.User, error) {

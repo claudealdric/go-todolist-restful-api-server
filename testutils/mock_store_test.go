@@ -55,7 +55,7 @@ func TestGetUserByEmail(t *testing.T) {
 
 		assert.HasNoError(t, err)
 		assert.Equals(t, mockStore.GetUserByEmailCalls, 1)
-		assert.Equals(t, gotUser, wantedUser)
+		assert.Equals(t, *gotUser, wantedUser)
 	})
 
 	t.Run("forcing GetUserByEmail to fail returns the forced error", func(t *testing.T) {
@@ -70,7 +70,7 @@ func TestGetUserByEmail(t *testing.T) {
 		gotUser, err := mockStore.GetUserByEmail(wantedUser.Email)
 
 		assert.ErrorContains(t, err, forcedError)
-		assert.Equals(t, gotUser, models.User{})
+		assert.Equals(t, gotUser, nil)
 		assert.Equals(t, mockStore.GetUserByEmailCalls, 1)
 	})
 
