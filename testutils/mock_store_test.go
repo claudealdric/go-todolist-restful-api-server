@@ -8,7 +8,7 @@ import (
 )
 
 func TestGetUserByEmail(t *testing.T) {
-	t.Run("GetUserById increments the internal counter and returns the wanted user", func(t *testing.T) {
+	t.Run("GetUserByEmail increments the internal counter and returns the wanted user", func(t *testing.T) {
 		mockStore := NewMockStore(false)
 		wantedUser := models.User{
 			Id:       1,
@@ -24,7 +24,7 @@ func TestGetUserByEmail(t *testing.T) {
 		assert.Equals(t, gotUser, wantedUser)
 	})
 
-	t.Run("forcing GetUserById to fail returns the forced error", func(t *testing.T) {
+	t.Run("forcing GetUserByEmail to fail returns the forced error", func(t *testing.T) {
 		mockStore := NewMockStore(true)
 		wantedUser := models.User{
 			Id:       1,
