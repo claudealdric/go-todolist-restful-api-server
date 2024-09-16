@@ -28,6 +28,20 @@ func TestGetUserByEmail(t *testing.T) {
 		assert.Equals(t, gotUser, wantedUser)
 	})
 
+	t.Run("forcing CreateUser to fail returns the forced error", func(t *testing.T) {
+		mockStore := NewMockStore(true)
+		dto := models.CreateUserDTO{
+			Name:     "Claude Aldric",
+			Email:    "claude.aldric@email.com",
+			Password: "password",
+		}
+		gotUser, err := mockStore.CreateUser(dto)
+
+		assert.ErrorContains(t, err, forcedError)
+		assert.Equals(t, mockStore.CreateUserCalls, 1)
+		assert.Equals(t, gotUser, models.User{})
+	})
+
 	t.Run("GetUserByEmail increments the internal counter and returns the wanted user", func(t *testing.T) {
 		mockStore := NewMockStore(false)
 		wantedUser := models.User{

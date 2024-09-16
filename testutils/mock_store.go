@@ -103,6 +103,9 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 
 func (m *mockStore) CreateUser(dto models.CreateUserDTO) (models.User, error) {
 	m.CreateUserCalls++
+	if m.shouldForceError {
+		return models.User{}, forcedError
+	}
 	user := models.User{
 		Id:       m.getNewUserId(),
 		Name:     dto.Name,
