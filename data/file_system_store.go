@@ -130,10 +130,16 @@ func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
 func (f *FileSystemStore) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 	users, _ := f.getUsersFromFile() // TODO: hanndle error
-	// TODO: handle not found case
-	user, _ = utils.SliceFind(users, func(u models.User) bool {
+	user, ok := utils.SliceFind(users, func(u models.User) bool {
 		return u.Email == email
 	})
+	if !ok {
+		return user, fmt.Errorf(
+			"user with email %s: %w",
+			email,
+			ErrResourceNotFound,
+		)
+	}
 	return user, nil
 }
 

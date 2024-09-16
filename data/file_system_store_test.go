@@ -179,4 +179,17 @@ func TestFileSystemStore(t *testing.T) {
 		assert.HasNoError(t, err)
 		assert.Equals(t, got, wantedUser)
 	})
+
+	t.Run("GetUserByEmail returns an `ErrNotFound` error if user does not exist", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonUsers))
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+		assert.HasNoError(t, err)
+
+		doesNotExistEmail := "does.not@exist.com"
+		_, err = store.GetUserByEmail(doesNotExistEmail)
+
+		assert.ErrorContains(t, err, data.ErrResourceNotFound)
+	})
 }
