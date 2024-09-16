@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
@@ -21,5 +22,8 @@ func (s *Server) HandlePostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(user)
+	err = json.NewEncoder(w).Encode(user)
+	if err != nil {
+		log.Printf("error encoding response: %v", err)
+	}
 }
