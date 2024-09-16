@@ -14,6 +14,7 @@ var forcedError = errors.New("forced error")
 
 type mockStore struct {
 	CreateTaskCalls     int
+	CreateUserCalls     int
 	GetTaskByIdCalls    int
 	GetTasksCalls       int
 	GetUserByEmailCalls int
@@ -22,6 +23,7 @@ type mockStore struct {
 	UpdateTaskCalls     int
 	Users               []models.User
 	lastTaskId          int
+	lastUserId          int
 	shouldForceError    bool
 }
 
@@ -39,7 +41,7 @@ func (m *mockStore) CreateTask(dto models.CreateTaskDTO) (models.Task, error) {
 	if m.shouldForceError {
 		return models.Task{}, forcedError
 	}
-	task := models.Task{Id: m.getNewId(), Title: dto.Title}
+	task := models.Task{Id: m.getNewTaskId(), Title: dto.Title}
 	m.Tasks = append(m.Tasks, task)
 	return task, nil
 }
@@ -99,6 +101,18 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 	return models.Task{}, data.ErrResourceNotFound
 }
 
+func (m *mockStore) CreateUser(dto models.CreateUserDTO) (models.User, error) {
+	m.CreateUserCalls++
+	user := models.User{
+		Id:       m.getNewUserId(),
+		Name:     dto.Name,
+		Email:    dto.Email,
+		Password: dto.Password,
+	}
+	m.Users = append(m.Users, user)
+	return user, nil
+}
+
 func (m *mockStore) GetUserByEmail(email string) (models.User, error) {
 	m.GetUserByEmailCalls++
 	if m.shouldForceError {
@@ -118,8 +132,14 @@ func (m *mockStore) GetUsers() ([]models.User, error) {
 	return m.Users, nil
 }
 
-func (m *mockStore) getNewId() int {
-	newId := m.lastTaskId + 1
+func (m *mockStore) getNewTaskId() int {
+	newTaskId := m.lastTaskId + 1
 	m.lastTaskId++
-	return newId
+	return newTaskId
+}
+
+func (m *mockStore) getNewUserId() int {
+	newUserId := m.lastUserId + 1
+	m.lastUserId++
+	return newUserId
 }

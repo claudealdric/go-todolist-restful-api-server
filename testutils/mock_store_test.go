@@ -8,6 +8,26 @@ import (
 )
 
 func TestGetUserByEmail(t *testing.T) {
+	t.Run("CreateUser increments the internal counter and returns the new user", func(t *testing.T) {
+		mockStore := NewMockStore(false)
+		dto := models.CreateUserDTO{
+			Name:     "Claude Aldric",
+			Email:    "claude.aldric@email.com",
+			Password: "password",
+		}
+		wantedUser := models.User{
+			Id:       1,
+			Name:     dto.Name,
+			Email:    dto.Email,
+			Password: dto.Password,
+		}
+		gotUser, err := mockStore.CreateUser(dto)
+
+		assert.HasNoError(t, err)
+		assert.Equals(t, mockStore.CreateUserCalls, 1)
+		assert.Equals(t, gotUser, wantedUser)
+	})
+
 	t.Run("GetUserByEmail increments the internal counter and returns the wanted user", func(t *testing.T) {
 		mockStore := NewMockStore(false)
 		wantedUser := models.User{
