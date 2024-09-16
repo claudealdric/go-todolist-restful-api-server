@@ -81,7 +81,7 @@ func TestFileSystemStoreTasks(t *testing.T) {
 		tasks, err := store.GetTasks()
 		assert.HasNoError(t, err)
 
-		assert.Contains(t, tasks, newTask)
+		assert.Contains(t, tasks, *newTask)
 	})
 
 	t.Run("DeleteTaskById deletes the selected task", func(t *testing.T) {

@@ -36,14 +36,14 @@ func NewMockStore(shouldError bool) *mockStore {
 	return m
 }
 
-func (m *mockStore) CreateTask(dto models.CreateTaskDTO) (models.Task, error) {
+func (m *mockStore) CreateTask(dto models.CreateTaskDTO) (*models.Task, error) {
 	m.CreateTaskCalls++
 	if m.shouldForceError {
-		return models.Task{}, forcedError
+		return nil, forcedError
 	}
 	task := models.Task{Id: m.getNewTaskId(), Title: dto.Title}
 	m.Tasks = append(m.Tasks, task)
-	return task, nil
+	return &task, nil
 }
 
 func (m *mockStore) GetTaskById(id int) (models.Task, error) {

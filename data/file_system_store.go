@@ -68,10 +68,10 @@ func (f *FileSystemStore) GetTasks() ([]models.Task, error) {
 	return tasks, nil
 }
 
-func (f *FileSystemStore) CreateTask(dto models.CreateTaskDTO) (models.Task, error) {
+func (f *FileSystemStore) CreateTask(dto models.CreateTaskDTO) (*models.Task, error) {
 	tasks, err := f.GetTasks()
 	if err != nil {
-		return models.Task{}, err
+		return nil, err
 	}
 	newId := f.getNewTaskId()
 	task := models.Task{
@@ -81,9 +81,9 @@ func (f *FileSystemStore) CreateTask(dto models.CreateTaskDTO) (models.Task, err
 	tasks = append(tasks, task)
 	err = f.overwriteFile(tasks)
 	if err != nil {
-		return models.Task{}, err
+		return nil, err
 	}
-	return task, nil
+	return &task, nil
 }
 
 func (f *FileSystemStore) DeleteTaskById(id int) error {
