@@ -40,4 +40,21 @@ func TestGetUserByEmail(t *testing.T) {
 		assert.Equals(t, mockStore.GetUserByEmailCalls, 1)
 	})
 
+	t.Run("GetUsers returns all users", func(t *testing.T) {
+		mockStore := NewMockStore(false)
+		initialUsers := []models.User{
+			models.User{
+				Id:       1,
+				Name:     "Claude Aldric",
+				Email:    "claude.aldric@email.com",
+				Password: "password",
+			},
+		}
+		mockStore.Users = initialUsers
+		users, err := mockStore.GetUsers()
+
+		assert.HasNoError(t, err)
+		assert.Equals(t, mockStore.GetUsersCalls, 1)
+		assert.Equals(t, users, initialUsers)
+	})
 }

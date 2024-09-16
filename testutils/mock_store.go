@@ -17,6 +17,7 @@ type mockStore struct {
 	GetTaskByIdCalls    int
 	GetTasksCalls       int
 	GetUserByEmailCalls int
+	GetUsersCalls       int
 	Tasks               []models.Task
 	UpdateTaskCalls     int
 	Users               []models.User
@@ -107,6 +108,11 @@ func (m *mockStore) GetUserByEmail(email string) (models.User, error) {
 		return u.Email == email
 	})
 	return user, nil
+}
+
+func (m *mockStore) GetUsers() ([]models.User, error) {
+	m.GetUsersCalls++
+	return m.Users, nil
 }
 
 func (m *mockStore) getNewId() int {
