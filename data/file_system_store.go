@@ -129,7 +129,10 @@ func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
 
 func (f *FileSystemStore) GetUserByEmail(email string) (models.User, error) {
 	var user models.User
-	users, _ := f.getUsersFromFile() // TODO: hanndle error
+	users, err := f.getUsersFromFile()
+	if err != nil {
+		return user, err
+	}
 	user, ok := utils.SliceFind(users, func(u models.User) bool {
 		return u.Email == email
 	})
