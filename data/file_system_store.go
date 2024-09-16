@@ -148,7 +148,7 @@ func (f *FileSystemStore) GetUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (f *FileSystemStore) CreateUser(dto models.CreateUserDTO) (*models.User, error) {
+func (f *FileSystemStore) CreateUser(dto *models.CreateUserDTO) (*models.User, error) {
 	users, err := f.GetUsers()
 	if err != nil {
 		return nil, err

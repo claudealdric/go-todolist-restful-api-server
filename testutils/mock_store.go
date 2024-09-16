@@ -101,7 +101,7 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 	return models.Task{}, data.ErrResourceNotFound
 }
 
-func (m *mockStore) CreateUser(dto models.CreateUserDTO) (*models.User, error) {
+func (m *mockStore) CreateUser(dto *models.CreateUserDTO) (*models.User, error) {
 	m.CreateUserCalls++
 	if m.shouldForceError {
 		return nil, forcedError

@@ -21,7 +21,7 @@ func TestGetUserByEmail(t *testing.T) {
 			Email:    dto.Email,
 			Password: dto.Password,
 		}
-		gotUser, err := mockStore.CreateUser(dto)
+		gotUser, err := mockStore.CreateUser(&dto)
 
 		assert.HasNoError(t, err)
 		assert.Equals(t, mockStore.CreateUserCalls, 1)
@@ -35,7 +35,7 @@ func TestGetUserByEmail(t *testing.T) {
 			Email:    "claude.aldric@email.com",
 			Password: "password",
 		}
-		gotUser, err := mockStore.CreateUser(dto)
+		gotUser, err := mockStore.CreateUser(&dto)
 
 		assert.ErrorContains(t, err, forcedError)
 		assert.Equals(t, mockStore.CreateUserCalls, 1)

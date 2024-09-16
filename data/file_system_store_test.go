@@ -190,7 +190,7 @@ func TestFileSystemStoreUsers(t *testing.T) {
 			Email:    "john.doe@email.com",
 			Password: "password",
 		}
-		newUser, err := store.CreateUser(dto)
+		newUser, err := store.CreateUser(&dto)
 		wantedUser := models.User{
 			Id:       1,
 			Name:     dto.Name,

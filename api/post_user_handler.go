@@ -16,7 +16,7 @@ func (s *Server) HandlePostUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	user, err := s.store.CreateUser(dto)
+	user, err := s.store.CreateUser(&dto)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
