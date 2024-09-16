@@ -31,7 +31,7 @@ func (s *Server) HandlePatchTask(w http.ResponseWriter, r *http.Request) {
 	}
 	task.Id = id
 
-	updatedTask, err := s.store.UpdateTask(task)
+	updatedTask, err := s.store.UpdateTask(&task)
 	if errors.Is(err, data.ErrResourceNotFound) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return

@@ -124,7 +124,7 @@ func TestFileSystemStoreTasks(t *testing.T) {
 		task := initialTasks[0]
 		newTitle := "Buy food"
 		updatedTask, err := store.UpdateTask(
-			models.Task{
+			&models.Task{
 				Id:    task.Id,
 				Title: newTitle,
 			},
@@ -147,7 +147,7 @@ func TestFileSystemStoreTasks(t *testing.T) {
 
 		newTitle := "Buy food"
 		_, err = store.UpdateTask(
-			models.Task{
+			&models.Task{
 				Id:    -1,
 				Title: newTitle,
 			},

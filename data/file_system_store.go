@@ -102,7 +102,7 @@ func (f *FileSystemStore) DeleteTaskById(id int) error {
 	return f.overwriteFile(tasks)
 }
 
-func (f *FileSystemStore) UpdateTask(task models.Task) (*models.Task, error) {
+func (f *FileSystemStore) UpdateTask(task *models.Task) (*models.Task, error) {
 	tasks, err := f.GetTasks()
 	if err != nil {
 		return nil, err
