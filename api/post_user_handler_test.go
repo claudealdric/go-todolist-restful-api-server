@@ -47,23 +47,23 @@ func TestHandlePostUser(t *testing.T) {
 		)
 	})
 
-	// t.Run("responds with a 400 Bad Request given an invalid body", func(t *testing.T) {
-	// 	data := testutils.NewMockStore(false)
-	// 	server := NewServer(data)
-	//
-	// 	invalidJson := `{`
-	// 	request := httptest.NewRequest(
-	// 		http.MethodPost,
-	// 		"/users",
-	// 		bytes.NewBuffer([]byte(invalidJson)),
-	// 	)
-	// 	response := httptest.NewRecorder()
-	// 	server.Handler.ServeHTTP(response, request)
-	//
-	// 	assert.Status(t, response.Code, http.StatusBadRequest)
-	// 	assert.Calls(t, data.CreateUserCalls, 0)
-	// })
-	//
+	t.Run("responds with a 400 Bad Request given an invalid body", func(t *testing.T) {
+		data := testutils.NewMockStore(false)
+		server := NewServer(data)
+
+		invalidJson := `{`
+		request := httptest.NewRequest(
+			http.MethodPost,
+			"/users",
+			bytes.NewBuffer([]byte(invalidJson)),
+		)
+		response := httptest.NewRecorder()
+		server.Handler.ServeHTTP(response, request)
+
+		assert.Status(t, response.Code, http.StatusBadRequest)
+		assert.Calls(t, data.CreateUserCalls, 0)
+	})
+
 	// t.Run("responds with a 500 error when the store user creation fails", func(t *testing.T) {
 	// 	data := testutils.NewMockStore(true)
 	// 	server := NewServer(data)
