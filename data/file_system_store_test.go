@@ -10,20 +10,9 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/utils"
 )
 
-func TestFileSystemStore(t *testing.T) {
+func TestFileSystemStoreTasks(t *testing.T) {
 	initialTasks := []models.Task{*models.NewTask(1, "Buy groceries")}
 	jsonTasks, err := utils.ConvertToJSON(initialTasks)
-	assert.HasNoError(t, err)
-
-	initialUsers := []models.User{
-		models.User{
-			Id:       1,
-			Name:     "Claude Aldric",
-			Email:    "claude.aldric@email.com",
-			Password: "password",
-		},
-	}
-	jsonUsers, err := utils.ConvertToJSON(initialUsers)
 	assert.HasNoError(t, err)
 
 	t.Run("works with an empty file", func(t *testing.T) {
@@ -164,6 +153,28 @@ func TestFileSystemStore(t *testing.T) {
 			},
 		)
 		assert.HasError(t, err)
+	})
+}
+
+func TestFileSystemStoreUsers(t *testing.T) {
+	initialUsers := []models.User{
+		models.User{
+			Id:       1,
+			Name:     "Claude Aldric",
+			Email:    "claude.aldric@email.com",
+			Password: "password",
+		},
+	}
+	jsonUsers, err := utils.ConvertToJSON(initialUsers)
+	assert.HasNoError(t, err)
+
+	t.Run("works with an empty file", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, "")
+		defer cleanDatabase()
+
+		_, err := data.NewFileSystemStore(database)
+
+		assert.HasNoError(t, err)
 	})
 
 	t.Run("GetUserByEmail returns the correct user if it exists", func(t *testing.T) {
