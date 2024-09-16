@@ -102,6 +102,9 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 
 func (m *mockStore) GetUserByEmail(email string) (models.User, error) {
 	m.GetUserByEmailCalls++
+	if m.shouldForceError {
+		return models.User{}, forcedError
+	}
 	user, _ := utils.SliceFind(m.Users, func(u models.User) bool {
 		return u.Email == email
 	})
