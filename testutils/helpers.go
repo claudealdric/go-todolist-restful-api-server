@@ -62,3 +62,18 @@ func GetTasksFromResponse(t *testing.T, body io.Reader) (tasks []models.Task) {
 
 	return tasks
 }
+
+func GetUserFromResponse(t *testing.T, body io.Reader) (user models.User) {
+	t.Helper()
+	err := json.NewDecoder(body).Decode(&user)
+
+	if err != nil {
+		t.Fatalf(
+			"unable to parse response from server %q into User: %v",
+			body,
+			err,
+		)
+	}
+
+	return user
+}
