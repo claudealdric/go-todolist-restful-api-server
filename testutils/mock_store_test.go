@@ -57,4 +57,22 @@ func TestGetUserByEmail(t *testing.T) {
 		assert.Equals(t, mockStore.GetUsersCalls, 1)
 		assert.Equals(t, users, initialUsers)
 	})
+
+	t.Run("forcing GetUsers to fail returns the forced error", func(t *testing.T) {
+		mockStore := NewMockStore(true)
+		initialUsers := []models.User{
+			models.User{
+				Id:       1,
+				Name:     "Claude Aldric",
+				Email:    "claude.aldric@email.com",
+				Password: "password",
+			},
+		}
+		mockStore.Users = initialUsers
+		users, err := mockStore.GetUsers()
+
+		assert.ErrorContains(t, err, forcedError)
+		assert.Equals(t, users, nil)
+		assert.Equals(t, mockStore.GetUsersCalls, 1)
+	})
 }

@@ -112,6 +112,9 @@ func (m *mockStore) GetUserByEmail(email string) (models.User, error) {
 
 func (m *mockStore) GetUsers() ([]models.User, error) {
 	m.GetUsersCalls++
+	if m.shouldForceError {
+		return nil, forcedError
+	}
 	return m.Users, nil
 }
 
