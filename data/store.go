@@ -15,4 +15,5 @@ type Store interface {
 	GetTasks() ([]models.Task, error)
 	UpdateTask(task models.Task) (models.Task, error)
 	GetUserByEmail(email string) (models.User, error)
+	GetUsers() ([]models.User, error)
 }

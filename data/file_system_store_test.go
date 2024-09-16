@@ -203,4 +203,18 @@ func TestFileSystemStoreUsers(t *testing.T) {
 
 		assert.ErrorContains(t, err, data.ErrResourceNotFound)
 	})
+
+	t.Run("GetUsers returns the stored users", func(t *testing.T) {
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonUsers))
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+
+		assert.HasNoError(t, err)
+
+		users, err := store.GetUsers()
+
+		assert.HasNoError(t, err)
+		assert.Equals(t, users, initialUsers)
+	})
 }

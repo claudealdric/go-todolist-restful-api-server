@@ -146,6 +146,14 @@ func (f *FileSystemStore) GetUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
+func (f *FileSystemStore) GetUsers() ([]models.User, error) {
+	users, err := f.getUsersFromFile()
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 func (f *FileSystemStore) getTasksFromFile() ([]models.Task, error) {
 	var tasks []models.Task
 	err := f.decoder.Decode(&tasks)
