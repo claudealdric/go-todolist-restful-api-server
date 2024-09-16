@@ -41,23 +41,22 @@ func NewFileSystemStore(file *os.File) (*FileSystemStore, error) {
 	}, nil
 }
 
-func (f *FileSystemStore) GetTaskById(id int) (models.Task, error) {
-	var task models.Task
+func (f *FileSystemStore) GetTaskById(id int) (*models.Task, error) {
 	tasks, err := f.getTasksFromFile()
 	if err != nil {
-		return task, err
+		return nil, err
 	}
 	task, ok := utils.SliceFind(tasks, func(t models.Task) bool {
 		return t.Id == id
 	})
 	if !ok {
-		return task, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"task with ID %d: %w",
 			id,
 			ErrResourceNotFound,
 		)
 	}
-	return task, nil
+	return &task, nil
 }
 
 func (f *FileSystemStore) GetTasks() ([]models.Task, error) {
@@ -117,7 +116,7 @@ func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
 	taskToUpdate.Title = task.Title
 	for i, t := range tasks {
 		if t.Id == task.Id {
-			tasks[i] = taskToUpdate
+			tasks[i] = *taskToUpdate
 			break
 		}
 	}
@@ -126,7 +125,7 @@ func (f *FileSystemStore) UpdateTask(task models.Task) (models.Task, error) {
 		return models.Task{}, err
 	}
 
-	return taskToUpdate, nil
+	return *taskToUpdate, nil
 }
 
 func (f *FileSystemStore) GetUserByEmail(email string) (*models.User, error) {

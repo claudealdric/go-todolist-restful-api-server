@@ -50,7 +50,7 @@ func TestFileSystemStoreTasks(t *testing.T) {
 		got, err := store.GetTaskById(wantedTask.Id)
 
 		assert.HasNoError(t, err)
-		assert.Equals(t, got, wantedTask)
+		assert.Equals(t, *got, wantedTask)
 	})
 
 	t.Run("GetTaskById returns an `ErrNotFound` error if task does not exist", func(t *testing.T) {
@@ -135,7 +135,7 @@ func TestFileSystemStoreTasks(t *testing.T) {
 
 		retrievedTask, err := store.GetTaskById(task.Id)
 		assert.HasNoError(t, err)
-		assert.Equals(t, retrievedTask, wantedTask)
+		assert.Equals(t, *retrievedTask, wantedTask)
 	})
 
 	t.Run("UpdateTaskById returns an error with an invalid ID", func(t *testing.T) {

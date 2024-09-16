@@ -46,21 +46,20 @@ func (m *mockStore) CreateTask(dto *models.CreateTaskDTO) (*models.Task, error) 
 	return &task, nil
 }
 
-func (m *mockStore) GetTaskById(id int) (models.Task, error) {
+func (m *mockStore) GetTaskById(id int) (*models.Task, error) {
 	m.GetTaskByIdCalls++
-	var task models.Task
 	if m.shouldForceError {
 		if id == -1 {
-			return task, data.ErrResourceNotFound
+			return nil, data.ErrResourceNotFound
 		} else {
-			return task, forcedError
+			return nil, forcedError
 		}
 	}
 	tasks, _ := m.GetTasks()
-	task, _ = utils.SliceFind(tasks, func(t models.Task) bool {
+	task, _ := utils.SliceFind(tasks, func(t models.Task) bool {
 		return t.Id == id
 	})
-	return task, nil
+	return &task, nil
 }
 
 func (m *mockStore) GetTasks() ([]models.Task, error) {
