@@ -16,7 +16,7 @@ func (s *Server) HandlePostTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	task, err := s.store.CreateTask(dto)
+	task, err := s.store.CreateTask(&dto)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

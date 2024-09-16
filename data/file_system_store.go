@@ -68,7 +68,7 @@ func (f *FileSystemStore) GetTasks() ([]models.Task, error) {
 	return tasks, nil
 }
 
-func (f *FileSystemStore) CreateTask(dto models.CreateTaskDTO) (*models.Task, error) {
+func (f *FileSystemStore) CreateTask(dto *models.CreateTaskDTO) (*models.Task, error) {
 	tasks, err := f.GetTasks()
 	if err != nil {
 		return nil, err

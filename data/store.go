@@ -9,7 +9,7 @@ import (
 var ErrResourceNotFound = errors.New("resource not found")
 
 type Store interface {
-	CreateTask(dto models.CreateTaskDTO) (*models.Task, error)
+	CreateTask(dto *models.CreateTaskDTO) (*models.Task, error)
 	DeleteTaskById(id int) error
 	GetTaskById(id int) (models.Task, error)
 	GetTasks() ([]models.Task, error)

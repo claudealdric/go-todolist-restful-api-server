@@ -75,7 +75,7 @@ func TestFileSystemStoreTasks(t *testing.T) {
 
 		assert.HasNoError(t, err)
 
-		newTask, err := store.CreateTask(models.CreateTaskDTO{"Launder clothes"})
+		newTask, err := store.CreateTask(&models.CreateTaskDTO{"Launder clothes"})
 		assert.HasNoError(t, err)
 
 		tasks, err := store.GetTasks()
