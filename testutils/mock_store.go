@@ -18,15 +18,19 @@ type mockStore struct {
 	GetTasksCalls    int
 	UpdateTaskCalls  int
 	Tasks            []models.Task
+
+	GetUserByEmailCalls int
+	Users               []models.User
+
 	shouldForceError bool
-	lastId           int
+	lastTaskId       int
 }
 
 func NewMockStore(shouldError bool) *mockStore {
 	m := &mockStore{
 		Tasks:            initialMockStoreTasks,
 		shouldForceError: shouldError,
-		lastId:           1,
+		lastTaskId:       1,
 	}
 	return m
 }
@@ -97,11 +101,15 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 }
 
 func (m *mockStore) GetUserByEmail(email string) (models.User, error) {
-	return models.User{}, nil
+	m.GetUserByEmailCalls++
+	user, _ := utils.SliceFind(m.Users, func(u models.User) bool {
+		return u.Email == email
+	})
+	return user, nil
 }
 
 func (m *mockStore) getNewId() int {
-	newId := m.lastId + 1
-	m.lastId++
+	newId := m.lastTaskId + 1
+	m.lastTaskId++
 	return newId
 }
