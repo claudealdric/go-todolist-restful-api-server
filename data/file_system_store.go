@@ -148,10 +148,10 @@ func (f *FileSystemStore) GetUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
-func (f *FileSystemStore) CreateUser(dto models.CreateUserDTO) (models.User, error) {
+func (f *FileSystemStore) CreateUser(dto models.CreateUserDTO) (*models.User, error) {
 	users, err := f.GetUsers()
 	if err != nil {
-		return models.User{}, err
+		return nil, err
 	}
 	newId := f.getNewUserId()
 	user := models.User{
@@ -163,9 +163,9 @@ func (f *FileSystemStore) CreateUser(dto models.CreateUserDTO) (models.User, err
 	users = append(users, user)
 	err = f.overwriteFile(users)
 	if err != nil {
-		return models.User{}, err
+		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
 func (f *FileSystemStore) GetUsers() ([]models.User, error) {

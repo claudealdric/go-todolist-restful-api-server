@@ -25,7 +25,7 @@ func TestGetUserByEmail(t *testing.T) {
 
 		assert.HasNoError(t, err)
 		assert.Equals(t, mockStore.CreateUserCalls, 1)
-		assert.Equals(t, gotUser, wantedUser)
+		assert.Equals(t, *gotUser, wantedUser)
 	})
 
 	t.Run("forcing CreateUser to fail returns the forced error", func(t *testing.T) {
@@ -39,7 +39,7 @@ func TestGetUserByEmail(t *testing.T) {
 
 		assert.ErrorContains(t, err, forcedError)
 		assert.Equals(t, mockStore.CreateUserCalls, 1)
-		assert.Equals(t, gotUser, models.User{})
+		assert.Equals(t, gotUser, nil)
 	})
 
 	t.Run("GetUserByEmail increments the internal counter and returns the wanted user", func(t *testing.T) {

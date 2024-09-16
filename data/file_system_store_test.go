@@ -198,11 +198,11 @@ func TestFileSystemStoreUsers(t *testing.T) {
 			Password: dto.Password,
 		}
 		assert.HasNoError(t, err)
-		assert.Equals(t, newUser, wantedUser)
+		assert.Equals(t, *newUser, wantedUser)
 
 		users, err := store.GetUsers()
 		assert.HasNoError(t, err)
-		assert.Contains(t, users, newUser)
+		assert.Contains(t, users, *newUser)
 	})
 
 	t.Run("GetUserByEmail returns the correct user if it exists", func(t *testing.T) {

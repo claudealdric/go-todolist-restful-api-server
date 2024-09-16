@@ -15,7 +15,7 @@ type Store interface {
 	GetTasks() ([]models.Task, error)
 	UpdateTask(task models.Task) (models.Task, error)
 
-	CreateUser(dto models.CreateUserDTO) (models.User, error)
+	CreateUser(dto models.CreateUserDTO) (*models.User, error)
 	GetUserByEmail(email string) (models.User, error)
 	GetUsers() ([]models.User, error)
 }

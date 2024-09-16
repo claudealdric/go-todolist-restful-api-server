@@ -101,10 +101,10 @@ func (m *mockStore) UpdateTask(task models.Task) (models.Task, error) {
 	return models.Task{}, data.ErrResourceNotFound
 }
 
-func (m *mockStore) CreateUser(dto models.CreateUserDTO) (models.User, error) {
+func (m *mockStore) CreateUser(dto models.CreateUserDTO) (*models.User, error) {
 	m.CreateUserCalls++
 	if m.shouldForceError {
-		return models.User{}, forcedError
+		return nil, forcedError
 	}
 	user := models.User{
 		Id:       m.getNewUserId(),
@@ -113,7 +113,7 @@ func (m *mockStore) CreateUser(dto models.CreateUserDTO) (models.User, error) {
 		Password: dto.Password,
 	}
 	m.Users = append(m.Users, user)
-	return user, nil
+	return &user, nil
 }
 
 func (m *mockStore) GetUserByEmail(email string) (models.User, error) {
