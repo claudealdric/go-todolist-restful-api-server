@@ -15,17 +15,21 @@ func TestGetUserByEmail(t *testing.T) {
 			Email:    "claude.aldric@email.com",
 			Password: "password",
 		}
-		wantedUser := models.User{
-			Id:       1,
-			Name:     dto.Name,
-			Email:    dto.Email,
-			Password: dto.Password,
+		createdUser, err := mockStore.CreateUser(&dto)
+		gotUser := models.User{
+			Id:    createdUser.Id,
+			Name:  createdUser.Name,
+			Email: createdUser.Email,
 		}
-		gotUser, err := mockStore.CreateUser(&dto)
+		wantedUser := models.User{
+			Id:    1,
+			Name:  dto.Name,
+			Email: dto.Email,
+		}
 
 		assert.HasNoError(t, err)
 		assert.Equals(t, mockStore.CreateUserCalls, 1)
-		assert.Equals(t, *gotUser, wantedUser)
+		assert.Equals(t, gotUser, wantedUser)
 	})
 
 	t.Run("forcing CreateUser to fail returns the forced error", func(t *testing.T) {

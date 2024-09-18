@@ -10,6 +10,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestHandlePostUser(t *testing.T) {
@@ -31,8 +32,23 @@ func TestHandlePostUser(t *testing.T) {
 		)
 		response := httptest.NewRecorder()
 		server.Handler.ServeHTTP(response, request)
+		userFromResponse := testutils.GetUserFromResponse(t, response.Body)
+		gotUser := models.User{
+			Id:    userFromResponse.Id,
+			Name:  userFromResponse.Name,
+			Email: userFromResponse.Email,
+		}
 		newUser := models.NewUser(1, dto.Name, dto.Email, dto.Password)
+		wantedUser := models.User{
+			Id:    newUser.Id,
+			Name:  newUser.Name,
+			Email: newUser.Email,
+		}
 
+		assert.HasNoError(t, bcrypt.CompareHashAndPassword(
+			[]byte(userFromResponse.Password),
+			[]byte(newUser.Password),
+		))
 		assert.ContentType(
 			t,
 			testutils.GetContentTypeFromResponse(response),
@@ -40,11 +56,7 @@ func TestHandlePostUser(t *testing.T) {
 		)
 		assert.Status(t, response.Code, http.StatusCreated)
 		assert.Calls(t, data.CreateUserCalls, 1)
-		assert.Equals(
-			t,
-			testutils.GetUserFromResponse(t, response.Body),
-			*newUser,
-		)
+		assert.Equals(t, gotUser, wantedUser)
 	})
 
 	t.Run("responds with a 400 Bad Request given an invalid body", func(t *testing.T) {

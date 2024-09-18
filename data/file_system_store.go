@@ -9,6 +9,7 @@ import (
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type FileSystemStore struct {
@@ -153,11 +154,18 @@ func (f *FileSystemStore) CreateUser(dto *models.CreateUserDTO) (*models.User, e
 		return nil, err
 	}
 	newId := f.getNewUserId()
+	hashedPassword, err := bcrypt.GenerateFromPassword(
+		[]byte(dto.Password),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return nil, err
+	}
 	user := models.User{
 		Id:       newId,
 		Name:     dto.Name,
 		Email:    dto.Email,
-		Password: dto.Password,
+		Password: string(hashedPassword),
 	}
 	users = append(users, user)
 	err = f.overwriteFile(users)

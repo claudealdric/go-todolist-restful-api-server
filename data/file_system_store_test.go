@@ -8,6 +8,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils"
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
 	"github.com/claudealdric/go-todolist-restful-api-server/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestFileSystemStoreTasks(t *testing.T) {
@@ -191,14 +192,22 @@ func TestFileSystemStoreUsers(t *testing.T) {
 			Password: "password",
 		}
 		newUser, err := store.CreateUser(&dto)
+		gotUser := models.User{
+			Id:    newUser.Id,
+			Name:  newUser.Name,
+			Email: newUser.Email,
+		}
 		wantedUser := models.User{
-			Id:       1,
-			Name:     dto.Name,
-			Email:    dto.Email,
-			Password: dto.Password,
+			Id:    1,
+			Name:  dto.Name,
+			Email: dto.Email,
 		}
 		assert.HasNoError(t, err)
-		assert.Equals(t, *newUser, wantedUser)
+		assert.HasNoError(t, bcrypt.CompareHashAndPassword(
+			[]byte(newUser.Password),
+			[]byte(dto.Password),
+		))
+		assert.Equals(t, gotUser, wantedUser)
 
 		users, err := store.GetUsers()
 		assert.HasNoError(t, err)

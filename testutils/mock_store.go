@@ -7,6 +7,7 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/data"
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"github.com/claudealdric/go-todolist-restful-api-server/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var initialMockStoreTasks = []models.Task{*models.NewTask(1, "Pack clothes")}
@@ -105,11 +106,18 @@ func (m *mockStore) CreateUser(dto *models.CreateUserDTO) (*models.User, error) 
 	if m.shouldForceError {
 		return nil, forcedError
 	}
+	hashedPassword, err := bcrypt.GenerateFromPassword(
+		[]byte(dto.Password),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return nil, err
+	}
 	user := models.User{
 		Id:       m.getNewUserId(),
 		Name:     dto.Name,
 		Email:    dto.Email,
-		Password: dto.Password,
+		Password: string(hashedPassword),
 	}
 	m.Users = append(m.Users, user)
 	return &user, nil
