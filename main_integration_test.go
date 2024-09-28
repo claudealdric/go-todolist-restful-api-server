@@ -63,6 +63,24 @@ func TestServerWithSqliteStore(t *testing.T) {
 		fmt.Println("tasks", tasks)
 		assert.DoesNotContain(t, tasks, *unwantedTask)
 	})
+
+	t.Run("users", func(t *testing.T) {
+		createUserDTO := models.NewCreateUserDTO(
+			"Sherlock",
+			"sherlock@email.com",
+			"sherlocked",
+		)
+		postUserResponse, err := sendPostUser(server, createUserDTO)
+		assert.HasNoError(t, err)
+		createdUser := testutils.GetUserFromResponse(t, postUserResponse.Body)
+		wantedUser := models.NewUser(
+			createdUser.Id,
+			createUserDTO.Name,
+			createdUser.Email,
+			createUserDTO.Password,
+		)
+		assert.Equals(t, createdUser, *wantedUser)
+	})
 }
 
 func TestServerWithFileSystemStore(t *testing.T) {
@@ -226,6 +244,24 @@ func sendPostTask(server *api.Server, dto *models.CreateTaskDTO) (
 	request := httptest.NewRequest(
 		http.MethodPost,
 		"/tasks",
+		bytes.NewBuffer(jsonBody),
+	)
+	response := httptest.NewRecorder()
+	server.ServeHTTP(response, request)
+	return response, nil
+}
+
+func sendPostUser(server *api.Server, dto *models.CreateUserDTO) (
+	*httptest.ResponseRecorder,
+	error,
+) {
+	jsonBody, err := json.Marshal(dto)
+	if err != nil {
+		return nil, err
+	}
+	request := httptest.NewRequest(
+		http.MethodPost,
+		"/users",
 		bytes.NewBuffer(jsonBody),
 	)
 	response := httptest.NewRecorder()

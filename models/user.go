@@ -17,3 +17,12 @@ type CreateUserDTO struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+func NewCreateUserDTO(
+	name string,
+	email string,
+	password string,
+) *CreateUserDTO {
+	dto := CreateUserDTO{Name: name, Email: email, Password: password}
+	return &dto
+}
