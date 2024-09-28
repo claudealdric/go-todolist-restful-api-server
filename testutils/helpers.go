@@ -2,12 +2,14 @@ package testutils
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http/httptest"
 	"os"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
+	"github.com/claudealdric/go-todolist-restful-api-server/utils"
 )
 
 func CreateTempFile(t testing.TB, initialData string) (*os.File, func()) {
@@ -33,19 +35,22 @@ func GetContentTypeFromResponse(response *httptest.ResponseRecorder) string {
 	return response.Result().Header.Get("content-type")
 }
 
-func GetTaskFromResponse(t *testing.T, body io.Reader) (tasks models.Task) {
+func GetTaskFromResponse(t *testing.T, body io.Reader) *models.Task {
 	t.Helper()
+	var tasks models.Task
 	err := json.NewDecoder(body).Decode(&tasks)
 
 	if err != nil {
-		t.Fatalf(
-			"unable to parse response from server %q into Task: %v",
+		fmt.Printf(
+			"%s: unable to parse response from server %q into Task: %v\n",
+			utils.GetCurrentFunctionName(),
 			body,
 			err,
 		)
+		return nil
 	}
 
-	return tasks
+	return &tasks
 }
 
 func GetTasksFromResponse(t *testing.T, body io.Reader) (tasks []models.Task) {

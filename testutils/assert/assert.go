@@ -35,6 +35,20 @@ func DoesNotContain[T comparable](t testing.TB, slice []T, element T) {
 	}
 }
 
+func DoesNotEqual[T any](t testing.TB, got, want T) {
+	t.Helper()
+	switch v := any(got).(type) {
+	case string, int, int64, float64, bool:
+		if v == any(want) {
+			t.Errorf("got %v, want NOT %v", got, want)
+		}
+	default:
+		if reflect.DeepEqual(got, want) {
+			t.Errorf("got %v, want NOT %v", got, want)
+		}
+	}
+}
+
 func ErrorContains(t testing.TB, got, want error) {
 	t.Helper()
 	if !errors.Is(got, want) {

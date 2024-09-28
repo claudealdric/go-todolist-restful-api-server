@@ -33,7 +33,7 @@ func TestHandleGetTaskById(t *testing.T) {
 		assert.Calls(t, data.GetTaskByIdCalls, 1)
 		assert.Equals(
 			t,
-			testutils.GetTaskFromResponse(t, response.Body),
+			*testutils.GetTaskFromResponse(t, response.Body),
 			wantedTask,
 		)
 	})

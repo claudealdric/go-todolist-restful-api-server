@@ -42,7 +42,7 @@ func TestHandlePatchTask(t *testing.T) {
 		assert.Calls(t, data.UpdateTaskCalls, 1)
 		assert.Equals(
 			t,
-			testutils.GetTaskFromResponse(t, response.Body),
+			*testutils.GetTaskFromResponse(t, response.Body),
 			models.Task{Id: task.Id, Title: newTitle},
 		)
 	})
@@ -162,7 +162,7 @@ func TestHandlePatchTask(t *testing.T) {
 		assert.Calls(t, data.UpdateTaskCalls, 1)
 		assert.Equals(
 			t,
-			testutils.GetTaskFromResponse(t, response.Body),
+			*testutils.GetTaskFromResponse(t, response.Body),
 			models.Task{Id: taskToUpdate.Id, Title: newTitle},
 		)
 

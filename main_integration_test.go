@@ -2,10 +2,12 @@ package main
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/api"
@@ -15,7 +17,55 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/testutils/assert"
 )
 
-func TestServer(t *testing.T) {
+func TestServerWithSqliteStore(t *testing.T) {
+	dbFile := "./tmp/data.db"
+	db, err := sql.Open("sqlite3", dbFile)
+	assert.HasNoError(t, err)
+	defer db.Close()
+	data.InitDb(db)
+	defer cleanSqliteDatabase(dbFile)
+	store := data.NewSqliteStore(db)
+	server := api.NewServer(store)
+
+	t.Run("tasks", func(t *testing.T) {
+		createTaskDTO := models.NewCreateTaskDTO("Write integration tests")
+		createTaskResponse, err := sendPostTask(server, createTaskDTO)
+		assert.HasNoError(t, err)
+		createdTask := testutils.GetTaskFromResponse(t, createTaskResponse.Body)
+		wantedTask := models.NewTask(createdTask.Id, createTaskDTO.Title)
+		assert.Equals(t, createdTask, wantedTask)
+
+		getTaskByIdResponse := sendGetTaskById(server, createdTask.Id)
+		task := testutils.GetTaskFromResponse(t, getTaskByIdResponse.Body)
+		assert.Equals(t, task, wantedTask)
+
+		getTasksResponse := sendGetTasks(server)
+		tasks := testutils.GetTasksFromResponse(t, getTasksResponse.Body)
+		assert.Contains(t, tasks, *wantedTask)
+
+		updatedTitle := "Profit"
+		updateTaskDTO := models.UpdateTaskDTO{Title: &updatedTitle}
+		patchTaskResponse, err := sendPatchTask(server, updateTaskDTO, createdTask.Id)
+		assert.HasNoError(t, err)
+		task = testutils.GetTaskFromResponse(t, patchTaskResponse.Body)
+		wantedTask = models.NewTask(createdTask.Id, updatedTitle)
+		assert.Equals(t, task, wantedTask)
+
+		sendDeleteTask(server, createdTask.Id)
+		unwantedTask := wantedTask
+
+		getTaskByIdResponse = sendGetTaskById(server, createdTask.Id)
+		task = testutils.GetTaskFromResponse(t, getTaskByIdResponse.Body)
+		assert.Equals(t, task, nil)
+
+		getTasksResponse = sendGetTasks(server)
+		tasks = testutils.GetTasksFromResponse(t, getTasksResponse.Body)
+		fmt.Println("tasks", tasks)
+		assert.DoesNotContain(t, tasks, *unwantedTask)
+	})
+}
+
+func TestServerWithFileSystemStore(t *testing.T) {
 	dbFile, cleanDatabase := testutils.CreateTempFile(t, `[]`)
 	defer cleanDatabase()
 	store, err := data.NewFileSystemStore(dbFile)
@@ -65,7 +115,7 @@ func TestServer(t *testing.T) {
 		server.ServeHTTP(response, request)
 		assert.Status(t, response.Code, http.StatusOK)
 		got := testutils.GetTaskFromResponse(t, response.Body)
-		assert.Equals(t, got, wantedTask)
+		assert.Equals(t, *got, wantedTask)
 	})
 
 	t.Run("deletes the task with DELETE `/tasks/{id}`", func(t *testing.T) {
@@ -85,7 +135,7 @@ func TestServer(t *testing.T) {
 
 		getResponse := sendGetTasks(server)
 		tasks := testutils.GetTasksFromResponse(t, getResponse.Body)
-		assert.DoesNotContain(t, tasks, newTask)
+		assert.DoesNotContain(t, tasks, *newTask)
 	})
 
 	t.Run("updates the task with PATCH `/tasks/{id}`", func(t *testing.T) {
@@ -104,11 +154,11 @@ func TestServer(t *testing.T) {
 
 		updatedTask := testutils.GetTaskFromResponse(t, patchResponse.Body)
 		assert.Status(t, patchResponse.Code, http.StatusOK)
-		assert.Equals(t, updatedTask, *wantedTask)
+		assert.Equals(t, updatedTask, wantedTask)
 
 		getResponse := sendGetTaskById(server, taskId)
 		task := testutils.GetTaskFromResponse(t, getResponse.Body)
-		assert.Equals(t, task, *wantedTask)
+		assert.Equals(t, task, wantedTask)
 	})
 }
 
@@ -121,6 +171,19 @@ func sendGetTaskById(server *api.Server, id int) *httptest.ResponseRecorder {
 	response := httptest.NewRecorder()
 	server.ServeHTTP(response, request)
 	return response
+}
+
+func sendDeleteTask(
+	server *api.Server,
+	taskId int,
+) {
+	request := httptest.NewRequest(
+		http.MethodDelete,
+		fmt.Sprintf("/tasks/%d", taskId),
+		nil,
+	)
+	response := httptest.NewRecorder()
+	server.ServeHTTP(response, request)
 }
 
 func sendGetTasks(server *api.Server) *httptest.ResponseRecorder {
@@ -152,11 +215,11 @@ func sendPatchTask(
 	return response, nil
 }
 
-func sendPostTask(server *api.Server, task *models.CreateTaskDTO) (
+func sendPostTask(server *api.Server, dto *models.CreateTaskDTO) (
 	*httptest.ResponseRecorder,
 	error,
 ) {
-	jsonBody, err := json.Marshal(task)
+	jsonBody, err := json.Marshal(dto)
 	if err != nil {
 		return nil, err
 	}
@@ -168,4 +231,8 @@ func sendPostTask(server *api.Server, task *models.CreateTaskDTO) (
 	response := httptest.NewRecorder()
 	server.ServeHTTP(response, request)
 	return response, nil
+}
+
+func cleanSqliteDatabase(path string) {
+	os.Remove(path)
 }

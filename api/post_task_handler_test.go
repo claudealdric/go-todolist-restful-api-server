@@ -38,7 +38,7 @@ func TestHandlePostTask(t *testing.T) {
 		assert.Equals(
 			t,
 			testutils.GetTaskFromResponse(t, response.Body),
-			*newTask,
+			newTask,
 		)
 	})
 

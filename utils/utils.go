@@ -2,7 +2,9 @@ package utils
 
 import (
 	"encoding/json"
+	"runtime"
 	"slices"
+	"strings"
 )
 
 func ConvertToJSON(object any) ([]byte, error) {
@@ -11,6 +13,13 @@ func ConvertToJSON(object any) ([]byte, error) {
 		return nil, err
 	}
 	return jsonData, nil
+}
+
+func GetCurrentFunctionName() string {
+	pc, _, _, _ := runtime.Caller(1)
+	fullFuncName := runtime.FuncForPC(pc).Name()
+	funcNameParts := strings.Split(fullFuncName, "/")
+	return funcNameParts[len(funcNameParts)-1]
 }
 
 func SliceFind[T any](s []T, f func(T) bool) (T, bool) {
