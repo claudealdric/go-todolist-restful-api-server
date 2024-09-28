@@ -13,11 +13,12 @@ import (
 	"github.com/claudealdric/go-todolist-restful-api-server/data"
 )
 
+const dbFilePath = "./data/data.db"
 const port = 8080
 
 func main() {
-	os.Remove("./data/data.db")
-	db, err := sql.Open("sqlite3", "./data/data.db")
+	os.Remove(dbFilePath)
+	db, err := sql.Open("sqlite3", dbFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
