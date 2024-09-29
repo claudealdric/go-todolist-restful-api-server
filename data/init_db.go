@@ -14,7 +14,7 @@ func InitDb(db *sql.DB) {
 
 func createTasksTable(db *sql.DB) {
 	_, err := db.Exec(`
-		create table tasks (
+		create table if not exists tasks (
 			id integer primary key autoincrement,
 			title text not null
 		)
@@ -26,7 +26,7 @@ func createTasksTable(db *sql.DB) {
 
 func createUsersTable(db *sql.DB) {
 	_, err := db.Exec(`
-		create table users (
+		create table if not exists users (
 			id integer primary key autoincrement,
 			name text not null,
 			email text not null unique,
@@ -41,17 +41,8 @@ func createUsersTable(db *sql.DB) {
 func seedUsersTable(db *sql.DB) {
 	_, err := db.Exec(`
 		insert into users (name, email, password)
-		values
-			('Claude Aldric', 'cvaldric@gmail.com', 'Caput Draconis')
-	`)
-	if err != nil {
-		log.Fatalln("failed seeding the users table:", err)
-	}
-
-	_, err = db.Exec(`
-		insert into users (name, email, password)
-		values
-			('John Doe', 'john@email.com', 'password')
+		select 'Claude Aldric', 'cvaldric@gmail.com', 'Caput Draconis'
+		where not exists (select 1 from users)
 	`)
 	if err != nil {
 		log.Fatalln("failed seeding the users table:", err)
@@ -61,8 +52,8 @@ func seedUsersTable(db *sql.DB) {
 func seedTasksTable(db *sql.DB) {
 	_, err := db.Exec(`
 		insert into tasks (title)
-		values
-			('This is the first task')
+		select 'This is the first task'
+		where not exists (select 1 from tasks)
 	`)
 	if err != nil {
 		log.Fatalln("failed seeding the users table:", err)

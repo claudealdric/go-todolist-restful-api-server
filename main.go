@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -17,7 +16,6 @@ const dbFilePath = "./data/data.db"
 const port = 8080
 
 func main() {
-	os.Remove(dbFilePath)
 	db, err := sql.Open("sqlite3", dbFilePath)
 	if err != nil {
 		log.Fatal(err)
