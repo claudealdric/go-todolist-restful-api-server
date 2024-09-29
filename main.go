@@ -21,13 +21,13 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
-
 	data.InitDb(db)
 
 	store := data.NewSqliteStore(db)
 	if err != nil {
 		log.Fatalf("problem creating file system data store: %v", err)
 	}
+
 	server := api.NewServer(store)
 	log.Printf("Starting server on port %d", port)
 	err = http.ListenAndServe(fmt.Sprintf(":%d", port), server)
