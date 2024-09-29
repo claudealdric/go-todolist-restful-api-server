@@ -14,18 +14,19 @@ var initialMockStoreTasks = []models.Task{*models.NewTask(1, "Pack clothes")}
 var forcedError = errors.New("forced error")
 
 type mockStore struct {
-	CreateTaskCalls     int
-	CreateUserCalls     int
-	GetTaskByIdCalls    int
-	GetTasksCalls       int
-	GetUserByEmailCalls int
-	GetUsersCalls       int
-	Tasks               []models.Task
-	UpdateTaskCalls     int
-	Users               []models.User
-	lastTaskId          int
-	lastUserId          int
-	shouldForceError    bool
+	CreateTaskCalls              int
+	CreateUserCalls              int
+	GetTaskByIdCalls             int
+	GetTasksCalls                int
+	GetUserByEmailCalls          int
+	GetUsersCalls                int
+	Tasks                        []models.Task
+	UpdateTaskCalls              int
+	Users                        []models.User
+	ValidateUserCredentialsCalls int
+	lastTaskId                   int
+	lastUserId                   int
+	shouldForceError             bool
 }
 
 func NewMockStore(shouldError bool) *mockStore {
@@ -140,6 +141,14 @@ func (m *mockStore) GetUsers() ([]models.User, error) {
 		return nil, forcedError
 	}
 	return m.Users, nil
+}
+
+func (m *mockStore) ValidateUserCredentials(username, password string) bool {
+	m.ValidateUserCredentialsCalls++
+	if m.shouldForceError {
+		return false
+	}
+	return true
 }
 
 func (m *mockStore) getNewTaskId() int {

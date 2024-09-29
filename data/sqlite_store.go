@@ -155,7 +155,6 @@ func (s *SqliteStore) ValidateUserCredentials(email, password string) bool {
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		log.Printf("error with the password validation: %v\n", err)
 		return false
 	}
 	return true

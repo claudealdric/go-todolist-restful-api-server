@@ -254,4 +254,70 @@ func TestFileSystemStoreUsers(t *testing.T) {
 		assert.HasNoError(t, err)
 		assert.Equals(t, users, initialUsers)
 	})
+
+	t.Run("ValidateUserCredentials", func(t *testing.T) {
+		createUserDTO := models.NewCreateUserDTO(
+			"Claude Aldric",
+			"cvaldric@gmail.com",
+			"Caput Draconis",
+		)
+		hashedPassword, err := bcrypt.GenerateFromPassword(
+			[]byte(createUserDTO.Password),
+			bcrypt.DefaultCost,
+		)
+		assert.HasNoError(t, err)
+
+		initialUsers := []models.User{
+			models.User{
+				Id:       1,
+				Name:     "Claude Aldric",
+				Email:    "cvaldric@gmail.com",
+				Password: string(hashedPassword),
+			},
+		}
+		jsonUsers, err := utils.ConvertToJSON(initialUsers)
+		assert.HasNoError(t, err)
+
+		database, cleanDatabase := testutils.CreateTempFile(t, string(jsonUsers))
+		defer cleanDatabase()
+
+		store, err := data.NewFileSystemStore(database)
+		assert.HasNoError(t, err)
+
+		tests := []struct {
+			name     string
+			email    string
+			password string
+			want     bool
+		}{
+			{
+				name:     "when provided valid credentials",
+				email:    "cvaldric@gmail.com",
+				password: "Caput Draconis",
+				want:     true,
+			},
+			{
+				name:     "when provided an invalid password",
+				email:    "cvaldric@gmail.com",
+				password: "password",
+				want:     false,
+			},
+			{
+				name:     "when provided an invalid email",
+				email:    "doesnotexist@email.com",
+				password: "Caput Draconis",
+				want:     false,
+			},
+		}
+
+		for _, test := range tests {
+			t.Run(test.name, func(t *testing.T) {
+				assert.Equals(
+					t,
+					store.ValidateUserCredentials(test.email, test.password),
+					test.want,
+				)
+			})
+		}
+	})
 }

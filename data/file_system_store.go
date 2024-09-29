@@ -183,6 +183,18 @@ func (f *FileSystemStore) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
+func (f *FileSystemStore) ValidateUserCredentials(email, password string) bool {
+	user, err := f.GetUserByEmail(email)
+	if err != nil {
+		return false
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func (f *FileSystemStore) getTasksFromFile() ([]models.Task, error) {
 	var tasks []models.Task
 	err := f.decoder.Decode(&tasks)
