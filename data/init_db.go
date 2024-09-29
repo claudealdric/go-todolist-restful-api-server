@@ -3,6 +3,9 @@ package data
 import (
 	"database/sql"
 	"log"
+
+	"github.com/claudealdric/go-todolist-restful-api-server/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func InitDb(db *sql.DB) {
@@ -39,11 +42,23 @@ func createUsersTable(db *sql.DB) {
 }
 
 func seedUsersTable(db *sql.DB) {
-	_, err := db.Exec(`
+	dto := models.NewCreateUserDTO(
+		"Claude Aldric",
+		"cvaldric@gmail.com",
+		"Caput Draconis",
+	)
+	hashedPassword, err := bcrypt.GenerateFromPassword(
+		[]byte(dto.Password),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		log.Fatalln("failed at hashing the password:", err)
+	}
+	_, err = db.Exec(`
 		insert into users (name, email, password)
-		select 'Claude Aldric', 'cvaldric@gmail.com', 'Caput Draconis'
+		select ?, ?, ?
 		where not exists (select 1 from users)
-	`)
+	`, dto.Name, dto.Email, hashedPassword)
 	if err != nil {
 		log.Fatalln("failed seeding the users table:", err)
 	}

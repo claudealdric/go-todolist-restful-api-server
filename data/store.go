@@ -18,4 +18,5 @@ type Store interface {
 	CreateUser(dto *models.CreateUserDTO) (*models.User, error)
 	GetUserByEmail(email string) (*models.User, error)
 	GetUsers() ([]models.User, error)
+	ValidateUserCredentials(username, password string) bool
 }

@@ -2,6 +2,7 @@ package data
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/claudealdric/go-todolist-restful-api-server/models"
 	"golang.org/x/crypto/bcrypt"
@@ -144,4 +145,18 @@ func (s *SqliteStore) UpdateTask(task *models.Task) (*models.Task, error) {
 	}
 
 	return updatedTask, nil
+}
+
+func (s *SqliteStore) ValidateUserCredentials(email, password string) bool {
+	user, err := s.GetUserByEmail(email)
+	if err != nil {
+		log.Printf("error retrieving user for validation: %v\n", err)
+		return false
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		log.Printf("error with the password validation: %v\n", err)
+		return false
+	}
+	return true
 }
