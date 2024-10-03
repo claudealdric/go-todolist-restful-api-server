@@ -12,12 +12,15 @@ type Router struct {
 func NewRouter(s *Server) *Router {
 	r := Router{}
 	r.Get("/{$}", s.HandleRoot)
+
 	r.Get("/tasks", s.HandleGetTasks)
 	r.Get("/tasks/{id}", s.HandleGetTaskById)
 	r.Patch("/tasks/{id}", s.HandlePatchTask)
 	r.Post("/tasks", s.HandlePostTask)
-	r.Post("/users", s.HandlePostUser)
 	r.Delete("/tasks/{id}", s.HandleDeleteTask)
+
+	r.Post("/users", s.HandlePostUser)
+	r.Post("/login", s.HandleLogin)
 	return &r
 }
 
